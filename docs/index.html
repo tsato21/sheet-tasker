@@ -40,9 +40,6 @@ layout: default
       </li>
       <li>
         <strong>Return to Original Format</strong>: Go to `Custom Menu` in the menu bar and click `BEFORE FIRST USE` > `Return to Original Format`. This deletes all sample task sheets and clears the contents in the index sheets. Also, it resets information and triggers pre-defined as a sample. This makes the Google Sheet ready for your use.
-        <div class="resize-image my-3">
-          <img src="assets/images/return-original.png" alt="return-original">
-        </div>
       </li>
       <li>
         <strong>Customize Constant Variables for Built-in Functions (Optional)</strong>: Go to the Apps Script editor and adjust the constants in `variables.gs` to suit your needs. This is optional and without customization, this project will still work.
@@ -64,31 +61,41 @@ layout: default
             <p>*If the user would like to reset all pre-defined information and delete triggers, Access <strong>`Custom Menu` > `SETTINGS` > `Reset All Pre-Defined Info & Triggers`</strong>.</p>
             <p>*Once the information is set, the button becomes either "update", "reset", or "delete", depending on type of the pre-set information.</p>
           </div>
-          <img src="path/to/setup-image-1.png" alt="Setup Image 1" class="img-fluid mt-2">
-          <img src="path/to/setup-image-2.png" alt="Setup Image 2" class="img-fluid mt-2">
+          <div class="resize-image my-3">
+            <img src="assets/images/setup-image-1.png" alt="Setup Image 1" class="img-fluid mt-2">
+            <img src="assets/images/setup-image-2.png" alt="Setup Image 2" class="img-fluid mt-2">
+        </div>
         </div>
       </li>
       <li class="list-group-item">
         Create task sheets and enter to-do items.
         <ul>
-          <li>Create new task sheets via <strong>`Custom Menu` > `TASK SHEETS` > `Create a New Task Sheet`</strong>.</li>
+          <li>Create new task sheets via <strong>`Custom Menu` > `TASK SHEETS` > `Create a New Task Sheet`</strong>. This enables the sheet to be created with designated format (row and column design, data validation, and making only designated users editable).</li>
           <li>Assign tasks to specific staff members using the dropdown in the task sheet.</li>
-          <li>Optionally, test reminder functionalities via <strong>Custom Menu > REMINDER</strong>.</li>
+          <p>If the user wants to modify editors of the sheet (staff in charge of the task sheet), they can modify it by `Custom Menu` > `TASK SHEETS` > `Modify Editors of the Current Sheet`.</p>
+          <li>Optionally, test reminder functionalities via <strong>Custom Menu > REMINDER</strong>. Befor the use of this feature, please set up necessary information in 'SETTING'.</li>
         </ul>
-        <img src="path/to/task-sheet-creation.png" alt="Task Sheet Creation Image" class="img-fluid mt-2">
+        <div class="resize-image my-3"></div>
+          <img src="assets/images/task-sheet-creation.png" alt="Task Sheet Creation Image">
+        </div>
       </li>
   
       <li class="list-group-item">
         Update completion status for tasks.
         <p>Input "C" in the complete cell for completed tasks in the reminder Google Docs to reflect the changes automatically in the Google Spreadsheet.</p>
+        <div class="resize-image my-3"></div>
+          <img src="assets/images/update-complete.png" alt="update-complete">
+        </div>
       </li>
   
       <li class="list-group-item">
         Update Index Sheets and Sort Task Sheets.
-        <strong>`Custom Menu` > `Update Index Sheets and Sort Task Sheets`</strong> to update index sheets and sort all of the task sheets by the date ascending.</p>
-        <p>*Once all of the tasks listed in a specific sheet are completed, rename the task sheet with "Fin)" and update index sheets via 
+        <strong>`Custom Menu` > `Update Index Sheets and Sort Task Sheets`</strong> to update index sheets (ongoing-task-index/ completed-task-index) and sort all of the task sheets by the date ascending.</p>
+        <p>*Once all of the tasks listed in a specific sheet are completed, rename the task sheet with "Fin)". These sheets will be automatically listed in `completed-task-index`. </p>
       </li>
-      <img src="path/to/update-index-sort-taskSh.png" alt="update-index-sort-taskSh" class="img-fluid mt-2"> 
+      <div class="resize-image my-3"></div>
+        <img src="assets/images/update-index.png" alt="update-index">
+      </div>
       
     </ol>
 
