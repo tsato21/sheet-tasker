@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 10px;
+      background-color: #f4f4f4;
+    }
+    h2 {
+      color: #333;
+    }
+    input[type="text"] {
+      width: 80%;
+      padding: 10px;
+      margin: 10px 0;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+    button {
+      background-color: #4CAF50;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    button:hover {
+      opacity: 0.9;
+    }
+    #staffBasedUrlsContainer {
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h2>General Reminder URLs</h2>
+  <input type="text" id="generalTodayReminderDocUrl" 
+        data-placeholder="Input General Today's Reminder URL HERE"
+        value="<?= generalTodayReminderDocUrl ?>"
+        placeholder="">
+  <input type="text" id="generalWeekReminderDocUrl" 
+        data-placeholder="Input General Next Week's Reminder URL HERE"
+        value="<?= generalWeekReminderDocUrl ?>"
+        placeholder="">
+
+  <h2>Staff-Based Reminder URLs</h2>
+  <div>
+    <? if (staffBasedReminderData.length > 0) { ?>
+      <? for (let i = 0; i < staffBasedReminderData.length; i++) { ?>
+        <div>
+          <div><strong><?= staffBasedReminderData[i].name ?></strong></div>
+          <input type="text" 
+                class="staff-today-url" 
+                data-staff-name="<?= staffBasedReminderData[i].name ?>" 
+                data-staff-email="<?= staffBasedReminderData[i].email ?>" 
+                value="<?= staffBasedReminderData[i].todayUrl ?>"
+                placeholder="">
+          <input type="text" 
+                class="staff-nextweek-url" 
+                data-staff-name="<?= staffBasedReminderData[i].name ?>"
+                data-staff-email="<?= staffBasedReminderData[i].email ?>"
+                value="<?= staffBasedReminderData[i].nextWeekUrl ?>"
+                placeholder="">
+        </div>
+      <? } ?>
+    <? } else { ?>
+      <p>No staff is designated for staff-based reminders.</p>
+    <? } ?>
+  </div>
+  <button onclick="saveUrls()">Save Reminder URLs</button>
+
+  <script>
+    function setGeneralUrlPlaceholders() {
+      let generalTodayInput = document.getElementById('generalTodayReminderDocUrl');
+      let generalWeekInput = document.getElementById('generalWeekReminderDocUrl');
+
+      // Set placeholders based on whether a value is already set
+      let generalTodayPlaceholder = generalTodayInput.getAttribute('data-placeholder');
+      generalTodayInput.placeholder = generalTodayInput.value || generalTodayPlaceholder;
+
+      let generalWeekPlaceholder = generalWeekInput.getAttribute('data-placeholder');
+      generalWeekInput.placeholder = generalWeekInput.value || generalWeekPlaceholder;
+    }
+
+    // Call the function to set placeholders
+    setGeneralUrlPlaceholders();
+
+    // Set the placeholder text for each input field of Staff-Based Reminder URLs
+    document.querySelectorAll('.staff-today-url').forEach(input => {
+      let staffName = input.getAttribute('data-staff-name');
+      let placeholderText = input.value ? input.value : `Input ${staffName}'s Today's Reminder URL HERE`;
+      input.setAttribute('placeholder', placeholderText);
+    });
+
+    // Set the placeholder text for each input field of Staff-Based Reminder URLs
+    document.querySelectorAll('.staff-nextweek-url').forEach(input => {
+      let staffName = input.getAttribute('data-staff-name');
+      let placeholderText = input.value ? input.value : `Input ${staffName}'s Today's Reminder URL HERE`;
+      input.setAttribute('placeholder', placeholderText);
+    });
+
+    document.querySelectorAll('.staff-nextweek-url').forEach(input => {
+      let staffName = input.getAttribute('data-staff-name');
+      let placeholderText = input.value ? input.value : `Input ${staffName}'s Next Week's Reminder URL HERE`;
+      input.setAttribute('placeholder', placeholderText);
+    });
+
+    function saveUrls() {
+      let generalTodayReminderDocUrl = document.getElementById('generalTodayReminderDocUrl').value;
+      let generalWeekReminderDocUrl = document.getElementById('generalWeekReminderDocUrl').value;
+
+      let staffTodayUrls = document.getElementsByClassName('staff-today-url');
+      let staffNextWeekUrls = document.getElementsByClassName('staff-nextweek-url');
+      let staffBasedReminderData = [];
+
+      for (let i = 0; i < staffTodayUrls.length; i++) {
+          let staffName = staffTodayUrls[i].getAttribute('data-staff-name');
+          let staffEmail = staffTodayUrls[i].getAttribute('data-staff-email');
+          let staffObject = {};
+          staffObject[staffName] = {
+              email: staffEmail,
+              todayReminderUrl: staffTodayUrls[i].value || '',
+              nextWeekReminderUrl: staffNextWeekUrls[i].value || ''
+          };
+          staffBasedReminderData.push(staffObject);
+      }
+
+      if(staffBasedReminderData.length === 0){
+        staffBasedReminderData = null;
+      }
+
+      google.script.run.withSuccessHandler(closeDialog)
+                      .withFailureHandler(handleFailure)
+                      .storeReminderInfo({
+        generalTodayReminderDocUrl: generalTodayReminderDocUrl,
+        generalWeekReminderDocUrl: generalWeekReminderDocUrl,
+        staffBasedReminderData: staffBasedReminderData
+      });
+    }
+
+    function closeDialog() {
+      google.script.host.close();
+    }
+    function handleFailure(error) {
+      console.error("An error occurred: " + error);
+      alert("An error occurred: " + error);
+    }
+  </script>
+</body>
+</html>

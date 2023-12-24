@@ -1,0 +1,115 @@
+// Function to update both ongoing and completed task index sheets
+function updateAllTaskIndexSheets() {
+  // Global letiables
+  let ss = SpreadsheetApp.getActiveSpreadsheet();
+  let ongoingTaskIndexSh = ss.getSheetByName(ONGOING_TASKS_INDEX_SHEET_NAME);
+  let completedTaskIndexSh = ss.getSheetByName(COMPLETED_TASKS_INDEX_SHEET_NAME);
+  try {
+    let allSheets = ss.getSheets();
+    let ongoingTasks = {};
+    let completedTasks = {};
+
+    // Fetching and organizing tasks
+    allSheets.forEach(sheet => {
+      let sheetName = sheet.getName();
+      sortTaskSheetByDate(sheet, sheetName);
+      if (sheetName.includes(":") && !sheet.isSheetHidden()) {
+        let category, task;
+        let sheetGID = sheet.getSheetId();
+        let sheetURL = `${ss.getUrl()}#gid=${sheetGID}`;
+        let taskInfo = { url: sheetURL };
+
+        if (sheetName.includes("完了")) {
+          [category, task] = sheetName.replace("完了)", "").split(":").map(part => part.trim());
+          completedTasks[category] = completedTasks[category] || [];
+          taskInfo.task = task;
+          completedTasks[category].push(taskInfo);
+        } else {
+          [category, task] = sheetName.split(":").map(part => part.trim());
+          ongoingTasks[category] = ongoingTasks[category] || [];
+          taskInfo.task = task;
+          ongoingTasks[category].push(taskInfo);
+        }
+      }
+    });
+
+    // Update the ongoing task index sheet
+    updateSheetWithTaskData(ongoingTaskIndexSh, ongoingTasks, "#FF8C00");
+
+    // Update the completed task index sheet
+    updateSheetWithTaskData(completedTaskIndexSh, completedTasks, "#696969");
+
+  } catch (error) {
+    Logger.log("Error updating task index sheets: " + error.message);
+    Logger.log("Stack Trace: " + error.stack);
+  }
+}
+
+
+// Function to update a specific sheet with task data
+function updateSheetWithTaskData(sheetToUpdate, categoryData, tabColor) {
+  sheetToUpdate.clear();
+  let lastColNum = sheetToUpdate.getMaxColumns();
+  let needColNum = Object.keys(categoryData).length * 2 + 1;  // Each category requires 2 columns (the first column is for data insertion and the second one is for space between the inserted data and the next data) "+1" is for the column A (the one for set buttons to execute functions)
+
+  // Log current status
+  // console.log(`${sheetToUpdate.getSheetName()}: lastColNum is ${lastColNum}, needColNum is ${needColNum}`);
+
+  // Check if additional columns are needed
+  if (lastColNum < needColNum){
+    // Insert enough columns to meet the requirement
+    let columnsToInsert = needColNum - lastColNum;
+    sheetToUpdate.insertColumnsAfter(lastColNum, columnsToInsert);
+    // console.log(`${columnsToInsert} columns were inserted.`);
+  }
+
+  let currentCol = 2;
+  for (let category in categoryData) {
+      let updates = [];
+      updates.push([category]);
+
+      let hyperlinkUpdates = [['']];  // Top cell is the category, no hyperlink for it.
+      
+      for (let taskInfo of categoryData[category]) {
+        updates.push([taskInfo.task]);
+        hyperlinkUpdates.push(['=HYPERLINK("' + taskInfo.url + '","' + taskInfo.task + '")']);
+      }
+
+      // Apply the updates in batches
+      sheetToUpdate.getRange(1, currentCol, updates.length).setValues(updates);
+      sheetToUpdate.getRange(2, currentCol, hyperlinkUpdates.length - 1).setFormulas(hyperlinkUpdates.slice(1)).setFontSize(11);
+
+      // Formatting 
+      sheetToUpdate.getRange(1, currentCol).setBackground("#D3D3D3")
+                                          .setFontSize(16)
+                                          .setFontWeight("bold")
+                                          .setWrap(true);
+
+      let lastRow = updates.length;
+      sheetToUpdate.getRange(1, currentCol, lastRow).setBorder(true, true, true, true, true, true)
+                                                    .setWrap(true)
+                                                    .setVerticalAlignment("middle")
+                                                    .setHorizontalAlignment("center");
+      
+      sheetToUpdate.setColumnWidth(currentCol, 150);
+      sheetToUpdate.setColumnWidth(currentCol + 1, 30);
+
+      currentCol += 2;
+    }
+
+    // Setting the tab color of the target sheet
+    sheetToUpdate.setTabColor(tabColor);
+  
+}
+
+
+function sortTaskSheetByDate(sheet, sheetName) {
+  let lastRow = sheet.getLastRow();
+  let lastCol = sheet.getLastColumn();
+
+  if (sheetName !== ONGOING_TASKS_INDEX_SHEET_NAME && sheetName !== COMPLETED_TASKS_INDEX_SHEET_NAME && lastRow > 1) {
+    // console.log(`sheetName is ${sheetName}`);
+    let range = sheet.getRange(2, 1, lastRow - 1, lastCol);
+    range.sort({ column: 4, ascending: true });
+  }
+}

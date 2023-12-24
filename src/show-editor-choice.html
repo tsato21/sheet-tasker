@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <base target="_top">
+    <script>
+        // These will be set by the Apps Script before the HTML fully loads
+        let currentEditors = <?= JSON.stringify(currentEditors) || '[]' ?>;
+        let action = <?= action ?>;
+        let sheetName = <?= sheetName ?>;
+    </script>
+    <style>
+        body {
+          font-family: 'Arial', sans-serif;
+          margin: 20px;
+        }
+
+        div {
+          margin-bottom: 10px;
+        }
+
+        input[type="button"] {
+          background-color: #4CAF50; /* Green */
+          border: none;
+          color: white;
+          padding: 10px 20px;
+          text-align: center;
+          text-decoration: none;
+          display: inline-block;
+          font-size: 16px;
+          margin: 4px 2px;
+          cursor: pointer;
+          border-radius: 4px;
+        }
+
+        input[type="button"]:hover {
+          background-color: #45a049; /* Darker green on hover */
+        }
+
+        label {
+          cursor: pointer;
+        }
+
+        label:hover {
+          text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+    <form id="staffForm">
+        <? 
+            for (let i = 0; i < existingStaffData.length; i++) { 
+                let staff = existingStaffData[i];
+                let isChecked = currentEditors.includes(staff.email) ? 'checked' : '';
+        ?>
+        <div>
+            <input type="checkbox" id="<?= staff.name ?>" name="staff" value="<?= staff.name + '|' + staff.email ?>" <?= isChecked ?>>
+            <label for="<?= staff.name ?>"><?= staff.name ?> (<?= staff.email ?>)</label>
+        </div>
+        <? } ?>
+        <input type="button" value="Submit" onclick="submitForm()">
+    </form>
+
+    <script>
+         function submitForm() {
+            let checkedStaff = [];
+            let checkboxes = document.getElementsByName("staff");
+
+            for (let checkbox of checkboxes) {
+                if (checkbox.checked) {
+                    checkedStaff.push(checkbox.value);
+                }
+            }
+
+            if (action === 'create') {
+                google.script.run.withSuccessHandler(closeDialog).createNewSheetWrapper(checkedStaff);
+            } else if (action === 'modify') {
+                google.script.run.withSuccessHandler(closeDialog).modifyEditorsWrapper(checkedStaff, sheetName);
+            } else {
+                google.script.run.withSuccessHandler(closeDialog).displayExecutionError(action);
+            }
+        }
+        function closeDialog() {
+            google.script.host.close();
+        }
+
+    </script>
+</body>
+
+</html>

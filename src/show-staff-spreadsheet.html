@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <base target="_top">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            text-align: center;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+
+        table {
+            margin: 20px auto;
+            border-collapse: collapse;
+            max-width: 350px;
+            width: 100%;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        th, td {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        td {
+            font-size: 15px;
+        }
+
+        .name {
+            font-weight: bold;
+        }
+
+        .email {
+            color: #0073e6;
+        }
+
+        input[value="Go to Setting"] {
+            margin-top: 20px;
+            padding: 10px 15px;
+            border: none;
+            background-color: #4CAF50;
+            color: #fff;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        input[value="Close"] {
+            margin-top: 20px;
+            margin-left: 40px;
+            padding: 10px 15px;
+            border: none;
+            background-color: #696969;
+            color: #fff;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        input[value="Go to Setting"]:hover {
+            background-color: #45a049;
+        }
+
+        input[value="Close"]:hover {
+            background-color: #909090;
+        }
+    </style>
+</head>
+
+<body>
+    <table id="staffListTable">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+            </tr>
+        </thead>
+        <tbody id="staffList">
+            <!-- Staff (editors of this Google Sheet) will be dynamically added here -->
+        </tbody>
+    </table>
+    <input type="button" value="Go to Setting" onclick="showSettingModal();">
+    <input type="button" class="close-button" value="Close" onclick="google.script.host.close();">
+
+    <script>
+        // Pass the staff data from the Apps Script to the frontend
+        let existingStaff = JSON.parse('<?= JSON.stringify(existingStaff) ?>');
+        console.log(existingStaff);
+        let staffList = document.getElementById('staffList');
+
+        existingStaff.forEach(staff => {
+            let row = document.createElement('tr');
+
+            let nameCell = document.createElement('td');
+            nameCell.textContent = staff.name;
+            nameCell.className = 'name';
+
+            let emailCell = document.createElement('td');
+            emailCell.textContent = staff.email;
+            emailCell.className = 'email';
+
+            row.appendChild(nameCell);
+            row.appendChild(emailCell);
+
+            staffList.appendChild(row);
+        });
+
+        function showSettingModal(){
+          google.script.run
+                    .withSuccessHandler(closeDialog)
+                    .withFailureHandler(handleFailure)
+                    .showSettingListsModal();
+        }
+
+        function handleFailure(error) {
+          console.error("An error occurred: " + error);
+          alert("An error occurred: " + error);
+        }
+        
+        function closeDialog() {
+          google.script.host.close();
+        }
+    </script>
+
+</body>
+
+</html>

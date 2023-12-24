@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Settings Display</title>
+    <base target="_top">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .category-title {
+            font-size: 20px;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+        .sub-category-title {
+            font-size: 17px;
+            margin-top: 15px;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .general-reminder {
+            color: #c00; /* Darker Red */
+        }
+
+        .staff-based-reminder {
+            color: #004c99; /* Darker Blue */
+        }
+
+        .others {
+            color: #006400; /* Darker Green */
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .type-cell {
+            width: 30%;
+        }
+        .description-cell {
+            width: 60%;
+        }
+        .button-cell{
+          text-align: center;
+        }
+        .update-button, .set-button, .delete-button {
+            color: white;
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 10px auto;
+        }
+        .delete-button {
+            background-color: #ff0000;
+        }
+        .update-button {
+            background-color: #FFA500;
+        }
+        .set-button {
+            background-color: #4CAF50;
+        }
+        button:hover {
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="category-title">General Setting</div>
+    <table>
+        <tr>
+            <th>Type</th>
+            <th>Description</th>
+            <th>Action</th>
+        </tr>
+        <tr>
+            <td class="type-cell">Staff of this Spreadsheet</td>
+            <td class="description-cell">Configure staff information for this Google Sheet (names and email addresses).</td>
+            <td class="button-cell">
+                <? if (isStaffPropertyKey) { ?>
+                    <button class="update-button" onclick="proceedSetting('updateStaff')">Update</button>
+                    <button class="delete-button" onclick="proceedSetting('resetStaff',<?= isStaffPropertyKey ?>)">Reset</button>
+                <? } else { ?>
+                    <button class="set-button" onclick="proceedSetting('setStaff')">Set</button>
+                <? } ?>
+            </td>
+        </tr>
+    </table>
+
+    <div class="category-title">Setting for Each Type of Reminder</div>
+
+    <!-- General Reminder Settings -->
+    <div class="sub-category-title general-reminder">General Reminder Settings: Reminds designated staff of ALL incompleted tasks</div>
+    <table>
+        <tr>
+            <th>Type</th>
+            <th>Description</th>
+            <th>Action</th>
+        </tr>
+        <tr>
+            <td class="type-cell">Staff for General Reminder</td>
+            <td class="description-cell">Specify staff to receive general reminder emails.</td>
+            <td class="button-cell">
+                <? if (isGeneralReminderEmailPropertyKey) { ?>
+                    <button class="update-button" onclick="proceedSetting('setGeneralReminderEmails')">Update</button>
+                    <button class="delete-button" onclick="proceedSetting('resetGeneralReminderEmails',<?= isGeneralReminderEmailPropertyKey ?>)">Reset</button>
+                <? } else { ?>
+                    <button class="set-button" onclick="proceedSetting('setGeneralReminderEmails')">Set</button>
+                <? } ?>
+            </td>
+        </tr>
+        <tr>
+            <td class="type-cell">Google Doc for General Reminder</td>
+            <td class="description-cell">URL to the Google Doc that displays general reminders.</td>
+            <td class="button-cell">
+                <? if (isGeneralReminderDocURLPropertyKey) { ?>
+                    <button class="update-button" onclick="proceedSetting('setGeneralReminderDocURLs')">Update</button>
+                    <button class="delete-button" onclick="proceedSetting('resetGeneralReminderDocURLs',<?= isGeneralReminderDocURLPropertyKey ?>)">Reset</button>
+                <? } else { ?>
+                    <button class="set-button" onclick="proceedSetting('setGeneralReminderDocURLs')">Set</button>
+                <? } ?>
+            </td>
+        </tr>
+        <tr>
+            <td class="type-cell">Trigger for Today's General Reminder</td>
+            <td class="description-cell">Sets a trigger to send reminder through Gmail/Google Doc showing all incomplete tasks whose dates are today or before.<br>【Trigger Details】Time-drive/ Daily timer/ 8am</td>
+            <td class="button-cell">
+                <? if (isGeneralReminderTodaySet) { ?>
+                    <button class="delete-button" onclick="proceedSetting('deleteGeneralReminderTodayTrigger')">Delete</button>
+                <? } else { ?>
+                    <button class="set-button" onclick="proceedSetting('setGeneralReminderTodayTrigger')">Set</button>
+                <? } ?>
+            </td>
+        </tr>
+        <tr>
+            <td class="type-cell">Trigger for Next Week's General Reminder</td>
+            <td class="description-cell">Sets a trigger to send reminder through Gmail/Google Doc showing all incomplete tasks whose dates are in 5 days excluding Saturday and Sunday or before.<br>【Trigger Details】Time-drive/ Week timer/ Every Friday/ 4pm</td>
+            <td class="button-cell">
+                <? if (isGeneralReminderNextWeekSet) { ?>
+                    <button class="delete-button" onclick="proceedSetting('deleteGeneralReminderNextWeekTrigger')">Delete</button>
+                <? } else { ?>
+                    <button class="set-button" onclick="proceedSetting('setGeneralReminderNextWeekTrigger')">Set</button>
+                <? } ?>
+            </td>
+        </tr>
+    </table>
+
+    <!-- Staff-Based Reminder Settings -->
+    <div class="sub-category-title staff-based-reminder">Staff-Based Reminder Settings: Separately reminds each designated staff of imcompleted tasks assigned to the individual.</div>
+    <table>
+        <tr>
+            <th>Type</th>
+            <th>Description</th>
+            <th>Action</th>
+        </tr>
+        <tr>
+            <td class="type-cell">Staff for Staff-Based Reminders</td>
+            <td class="description-cell">Specify staff to receive staff-based reminder emails.</td>
+            <td class="button-cell">
+                <? if (isDesignatedStaffPropertyKey) { ?>
+                    <button class="update-button" onclick="proceedSetting('setDesignatedStaff')">Update</button>
+                    <button class="delete-button" onclick="proceedSetting('resetDesignatedStaff',<?= isDesignatedStaffPropertyKey ?>)">Reset</button>
+                <? } else { ?>
+                    <button class="set-button" onclick="proceedSetting('setDesignatedStaff')">Set</button>
+                <? } ?>
+            </td>
+        </tr>
+        <tr>
+            <td class="type-cell">Google Doc for Staff-Based Reminders</td>
+            <td class="description-cell">URL to the Google Doc that shows reminders tailored to individual staff members.</td>
+            <td class="button-cell">
+                <? if (isStaffBasedReminderDocURLPropertyKey) { ?>
+                    <button class="update-button" onclick="proceedSetting('setStaffBasedReminderDocURLs')">Update</button>
+                    <button class="delete-button" onclick="proceedSetting('resetStaffBasedReminderDocURLs',<?= isStaffBasedReminderDocURLPropertyKey ?>)">Reset</button>
+                <? } else { ?>
+                    <button class="set-button" onclick="proceedSetting('setStaffBasedReminderDocURLs')">Set</button>
+                <? } ?>
+            </td>
+        </tr>
+        <tr>
+            <td class="type-cell">Trigger for Today's Staff-Based Reminder</td>
+            <td class="description-cell">Sets a trigger for reminder of a specific staff through Gmail/Google Doc showing all incomplete tasks whose dates are today or before.<br>【Trigger Details】Time-drive/ Daily timer/ 8am</td>
+            <td class="button-cell">
+                <? if (isStaffReminderTodaySet) { ?>
+                    <button class="delete-button" onclick="proceedSetting('deleteStaffReminderTodayTrigger')">Delete</button>
+                <? } else { ?>
+                    <button class="set-button" onclick="proceedSetting('setStaffReminderTodayTrigger')">Set</button>
+                <? } ?>
+            </td>
+        </tr>
+            <td class="type-cell">Trigger for Next Week's Staff-Based Reminder</td>
+            <td class="description-cell">Sets a trigger to send reminder of a specific staff through Gmail/Google Doc showing all incomplete tasks whose dates are in 5 days excluding Saturday and Sunday or before.<br>【Trigger Details】Time-drive/ Week timer/ Every Friday/ 4pm</td>
+            <td class="button-cell">
+                <? if (isStaffReminderNextWeekSet) { ?>
+                    <button class="delete-button" onclick="proceedSetting('deleteStaffReminderNextWeekTrigger')">Delete</button>
+                <? } else { ?>
+                    <button class="set-button" onclick="proceedSetting('setStaffReminderNextWeekTrigger')">Set</button>
+                <? } ?>
+            </td>
+        <tr>
+    </table>
+
+<!-- Others -->
+    <div class="sub-category-title others">Others:</div>
+    <table>
+        <tr>
+            <th>Type</th>
+            <th>Description</th>
+            <th>Action</th>
+        </tr>
+        <tr>
+            <td class="type-cell">Trigger to integrate Completion Status in Reminder Docs with Management Spreadsheet</td>
+            <td class="description-cell">Check the complettion status in Docs and update management Spreadsheet (unchecked to checked).</td>
+            <td class="button-cell">
+                <? if (isUpdateCompletionStatusToSheet) { ?>
+                    <button class="delete-button" onclick="proceedSetting('deleteUpdateCompletionStatusToSheetTrigger')">Delete</button>
+                <? } else { ?>
+                    <button class="set-button" onclick="proceedSetting('setUpdateCompletionStatusToSheetTrigger')">Set</button>
+                <? } ?>
+            </td>
+        </tr>
+    </table>
+
+    <script>
+        function proceedSetting(settingType,scriptyPropertyKey) {
+            // Call your server-side function based on the value here
+
+            /*
+            For Staff of this Spreadsheet
+            */
+            if (settingType === 'setStaff') {
+                google.script.run.withSuccessHandler(closeDialog).withFailureHandler(handleFailure).setStaffInfo();
+                return;
+            } else if (settingType === 'resetStaff') {
+                google.script.run.withSuccessHandler(closeDialog).withFailureHandler(handleFailure).deleteDesignatedScriptProperty(settingType,scriptyPropertyKey);
+                return;
+            } else if (settingType === 'updateStaff') {
+                google.script.run.withSuccessHandler(closeDialog).withFailureHandler(handleFailure).updateStaffInfoModal();
+                return;
+            }
+
+            /*
+            For General Reminder
+            */
+            //Emails to send the reminder
+            if (settingType === 'setGeneralReminderEmails') {
+                google.script.run.withSuccessHandler(closeDialog).withFailureHandler(handleFailure).showGeneralReminderEmailsModal();
+                return;
+            } else if (settingType === 'resetGeneralReminderEmails') {
+                google.script.run.withSuccessHandler(closeDialog).withFailureHandler(handleFailure).deleteDesignatedScriptProperty(settingType,scriptyPropertyKey);
+                return;
+            }
+           //Docs to display the general reminder
+            if (settingType === 'setGeneralReminderDocURLs') {
+                google.script.run.withSuccessHandler(closeDialog).withFailureHandler(handleFailure).showUrlModal();
+                return;
+            } else if (settingType === 'resetGeneralReminderDocURLs') {
+                google.script.run.withSuccessHandler(closeDialog).withFailureHandler(handleFailure).deleteDesignatedScriptProperty(settingType,scriptyPropertyKey);
+                return;
+            }
+            //Trigger to send the today's reminder
+            if (settingType === 'setGeneralReminderTodayTrigger') {
+                google.script.run.withSuccessHandler(closeDialog).withFailureHandler(handleFailure).setReminderTrigger('runGeneralReminderToday');
+                return;
+            } else if (settingType === 'deleteGeneralReminderTodayTrigger') {
+                google.script.run.withSuccessHandler(closeDialog).withFailureHandler(handleFailure).deleteReminderTrigger('runGeneralReminderToday');
+                return;
+            }
+            //Trigger to send the next week's reminder
+            if (settingType === 'setGeneralReminderNextWeekTrigger') {
+                google.script.run.withSuccessHandler(closeDialog).withFailureHandler(handleFailure).setReminderTrigger('runGeneralReminderNextWeek');
+                return;
+            } else if (settingType === 'deleteGeneralReminderNextWeekTrigger') {
+                google.script.run.withSuccessHandler(closeDialog).withFailureHandler(handleFailure).deleteReminderTrigger('runGeneralReminderNextWeek');
+                return;
+            }
+
+
+            /*
+            For Staff Based Reminder
+            */
+            //Staff to send the staff-based reminder
+            if (settingType === 'setDesignatedStaff') {
+                google.script.run.withSuccessHandler(closeDialog).withFailureHandler(handleFailure).showDesignatedStaffModal();
+                return;
+            } else if (settingType === 'resetDesignatedStaff') {
+                google.script.run.withSuccessHandler(closeDialog).withFailureHandler(handleFailure).deleteDesignatedScriptProperty(settingType,scriptyPropertyKey);
+                return;
+            }
+            //Docs to display the staff-based reminder
+            if (settingType === 'setStaffBasedReminderDocURLs') {
+                google.script.run.withSuccessHandler(closeDialog).withFailureHandler(handleFailure).showUrlModal();
+                return;
+            } else if (settingType === 'resetStaffBasedReminderDocURLs') {
+                google.script.run.withSuccessHandler(closeDialog).withFailureHandler(handleFailure).deleteDesignatedScriptProperty(settingType,scriptyPropertyKey);
+                return;
+            }
+            //Trigger to send the today's reminder
+            if (settingType === 'setStaffReminderTodayTrigger') {
+                google.script.run.withSuccessHandler(closeDialog).withFailureHandler(handleFailure).setReminderTrigger('runStaffReminderToday');
+            } else if (settingType === 'deleteStaffReminderTodayTrigger') {
+                google.script.run.withSuccessHandler(closeDialog).withFailureHandler(handleFailure).deleteReminderTrigger('runStaffReminderToday');
+            }
+            //Trigger to send the next week's reminder
+            if (settingType === 'setStaffReminderNextWeekTrigger') {
+                google.script.run.withSuccessHandler(closeDialog).withFailureHandler(handleFailure).setReminderTrigger('runStaffReminderNextWeek');
+            } else if (settingType === 'deleteStaffReminderNextWeekTrigger') {
+                google.script.run.withSuccessHandler(closeDialog).withFailureHandler(handleFailure).deleteReminderTrigger('runStaffReminderNextWeek');
+            }
+
+            /*
+            Others
+            */
+            //Trigger to update completion status from Docs into Sheet
+            if (settingType === 'setUpdateCompletionStatusToSheetTrigger') {
+                google.script.run.withSuccessHandler(closeDialog).withFailureHandler(handleFailure).setReminderTrigger('updateCompletionStatusToSheet');
+            } else if (settingType === 'deleteUpdateCompletionStatusToSheetTrigger') {
+                google.script.run.withSuccessHandler(closeDialog).withFailureHandler(handleFailure).deleteReminderTrigger('updateCompletionStatusToSheet');
+            }
+            
+        }
+
+        function closeDialog() {
+          google.script.host.close();
+        }
+
+        function handleFailure(error) {
+          console.error("An error occurred: " + error);
+          alert("An error occurred: " + error);
+        }
+    </script>
+
+</body>
+</html>

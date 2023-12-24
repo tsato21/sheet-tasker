@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <style>
+      /* Style adjustments */
+      body {
+        font-family: Arial, sans-serif;
+        text-align: center;
+        padding: 20px;
+      }
+
+      a {
+        color: blue;
+        text-decoration: none;
+      }
+
+      a:hover {
+        text-decoration: underline; /* Adds underline on hover for better user interaction */
+      }
+
+      p {
+        font-size: 16px; /* Improved readability */
+      }
+    </style>
+  </head>
+  <body>
+    <? if (successOrFailure === 'success') { ?>
+      <p>
+        <? if (period === 'next week' && displayDocUrl) { ?>
+          Click <a href="<?= displayDocUrl ?>" target="_blank"><strong>HERE</strong></a> to get prepared for your next week's work.
+        <? } else if (displayDocUrl) { ?>
+          Click <a href="<?= displayDocUrl ?>" target="_blank"><strong>HERE</strong></a> to view target reminders and start your today's work.
+        <? } ?>
+      </p>
+    <? } else if (successOrFailure === 'failure'){ ?>
+      <p>
+        Google Document to display <?= period ?>'s <?= target ?> reminders is NOT set. Go to Setting from Custom Menu in <a href="<?= spreadSheetUrl ?>">this Spreadsheet</a> and set the URL for the Doc.
+      </p>
+    <? } ?>
+  </body>
+</html>

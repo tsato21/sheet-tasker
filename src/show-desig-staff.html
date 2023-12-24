@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <base target="_top">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            text-align: center;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+
+        table {
+            margin: 20px auto;
+            border-collapse: collapse;
+            max-width: 350px;
+            width: 100%;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        th, td {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        td {
+            font-size: 15px;
+        }
+
+        .name {
+            font-weight: bold;
+        }
+
+        .email {
+            color: #0073e6;
+        }
+
+        input[type="button"] {
+            margin-top: 20px;
+            padding: 10px 15px;
+            border: none;
+            color: #fff;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        /* Styles for the submit button */
+        .submit-button {
+            background-color: #4CAF50;
+        }
+
+        .submit-button:hover {
+            background-color: #45a049;
+        }
+
+        /* Styles for the close button */
+        .close-button {
+            background-color: #888888;  /* Gray color */
+        }
+
+        .close-button:hover {
+            background-color: #6b6b6b;  /* Darker gray for hover */
+        }
+
+    </style>
+</head>
+
+<body>
+    Staff data has been updated as follows.
+    <table id="staffListTable">
+        <thead>
+          <tr>
+              <th>Select</th>
+              <th>Name</th>
+              <th>Email</th>
+          </tr>
+        </thead>
+        <tbody id="staffList">
+            <!-- Designated Staff for staff-based reminders will be dynamically added here -->
+        </tbody>
+    </table>
+    <input type="button" class="submit-button" value="Submit" onclick="submitDesignation();">
+    <input type="button" class="close-button" value="Close" onclick="google.script.host.close();">
+
+      <script>
+          // Pass the staff data from the Apps Script to the frontend
+          let existingStaff = JSON.parse('<?= JSON.stringify(existingStaff) ?>');
+          let designatedStaff = JSON.parse('<?= JSON.stringify(designatedStaff) ?>');
+          let staffList = document.getElementById('staffList');
+
+          existingStaff.forEach(staff => {
+              let row = document.createElement('tr');
+
+              let selectCell = document.createElement('td');
+              let checkbox = document.createElement('input');
+              checkbox.type = "checkbox";
+              checkbox.value = `${staff.name}|${staff.email}`;  // This line was modified
+              checkbox.checked = designatedStaff.some(staff => staff.name === staff.name && staff.email === staff.email);
+              selectCell.appendChild(checkbox);
+
+              let nameCell = document.createElement('td');
+              nameCell.textContent = staff.name;
+              nameCell.className = 'name';
+
+              let emailCell = document.createElement('td');
+              emailCell.textContent = staff.email;
+              console.log(staff.email)
+              emailCell.className = 'email';
+
+              row.appendChild(selectCell);
+              row.appendChild(nameCell);
+              row.appendChild(emailCell);
+
+              staffList.appendChild(row);
+          });
+
+          function submitDesignation() {
+              let checkboxes = document.querySelectorAll("#staffList input[type='checkbox']");
+              let designatedStaff = [];
+              
+              checkboxes.forEach(cb => {
+                  if (cb.checked) {
+                      designatedStaff.push(cb.value);
+                  }
+              });
+
+              google.script.run.withSuccessHandler(closeDialog).setDesignatedStaff(designatedStaff);
+          }
+          function closeDialog() {
+            google.script.host.close();
+          }
+      </script>
+  </body>
+  </html>

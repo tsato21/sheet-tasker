@@ -1,0 +1,539 @@
+/**
+ * Represents a reminder with task details.
+ */
+class Reminder {
+    constructor(item, note, date, staff) {
+        this.item = item;
+        this.note = note;
+        this.date = date;
+        this.staff = staff;
+    }
+}
+
+/**
+ * Represents a reminder for a specific sheet.
+ */
+class SheetReminder {
+    constructor(sheetName, sheetURL, taskData) {
+        this.sheetName = sheetName;
+        this.sheetURL = sheetURL;
+        this.taskData = taskData;  // Array of Reminder objects
+    }
+}
+
+/**
+ * Manages reminders, including gathering, formatting, and sending.
+ */
+class ReminderManager {
+    /**
+     * @param {string} target - The target audience for the reminder ('general' or 'staffBased').
+     * @param {string} period - The period for the reminder ('today' or 'week').
+     */
+    constructor(target, period) {
+        this.target = target;
+        this.period = period;
+        this.reminderData = [];
+        this.ss = SpreadsheetApp.getActiveSpreadsheet();
+        this.scriptProperties = PropertiesService.getScriptProperties();
+    }
+
+    /**
+     * Formats a given Date object into a Japanese date string.
+     *
+     * @param {Date} dateObj - The Date object to format.
+     * @returns {string} - The formatted date string in Japanese format.
+     *
+     * @example
+     * let date = new Date(2023, 4, 5); // 5th May 2023
+     * console.log(ReminderManager.formatJapaneseDate(date)); // Outputs: "5月5日(金)"
+     */
+    static formatJapaneseDate(dateObj) {
+        let months = ["1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月"];
+        let days = ["日", "月", "火", "水", "木", "金", "土"];
+      
+        let month = months[dateObj.getMonth()];
+        let day = days[dateObj.getDay()];
+        let date = dateObj.getDate();
+      
+        return `${month}${date}日(${day})`;
+    }
+
+    /**
+     * Extracts the Google Document ID from a given URL.
+     *
+     * @param {string} url - The Google Document URL.
+     * @returns {string|null} - The extracted document ID or null if not found.
+     *
+     * @example
+     * let url = 'https://docs.google.com/document/d/XXXXXXXX/edit';
+     * let docId = ReminderManager.extractDocIdFromUrl(url);
+     * console.log(docId);  // Outputs: 1AFA8L0sKMcMVgagXMLqbInaNk06pZ4SZnjkqT-hi2_8
+     */
+    static extractDocIdFromUrl(url) {
+        let regex = /\/d\/(.*?)\//;
+        let match = url.match(regex);
+        if (match && match[1]) {
+            return match[1];
+        } else {
+            return null;  // or throw an error if you prefer
+        }
+    }
+
+    /**
+     * Gathers reminder data from the spreadsheet.
+     * @returns {Array<SheetReminder>} - Array of SheetReminder objects containing the reminder data.
+     * Example of reminderData structure:
+     *  [
+     *    {
+     *      sheetName: "Project A Tasks",
+     *      sheetUrl: "https://docs.google.com/spreadsheets/d/12345/edit#gid=67890",
+     *      taskData: [
+     *        {
+     *          item: "Complete budget report",
+     *          note: "Include projections for next quarter",
+     *          dateInfo: "2023-07-21",
+     *          staff: "John Doe"
+     *        },
+     *        {
+     *          item: "Update project timeline",
+     *          note: "Reflect changes in deliverable dates",
+     *          dateInfo: "2023-07-22",
+     *          staff: "Jane Smith"
+     *        }
+     *      ]
+     *    },
+     *    {
+     *      sheetName: "Project B Tasks",
+     *      sheetUrl: "https://docs.google.com/spreadsheets/d/54321/edit#gid=09876",
+     *      taskData: [
+     *        {
+     *          item: "Review codebase for errors",
+     *          note: "Focus on the authentication module",
+     *          dateInfo: "2023-07-23",
+     *          staff: "John Doe"
+     *        },
+     *      ]
+     *    }
+     *  ]
+     */
+    getReminderData() {
+        console.log('Starting getReminderData...');
+        let startTime = new Date().getTime();
+        let sheets = this.ss.getSheets();
+        // Fetch the STORED_REMINDERS property
+        let storedDataStr = this.scriptProperties.getProperty(SCRIPT_PROPERRY_KEY_STORED_REMINDERS);
+
+        if (storedDataStr) {
+          // If the property exists, attempt to parse it as JSON
+          try {
+            this.reminderData = JSON.parse(storedDataStr);
+            console.log(`There are some reminderData already stored in the previous execution.`);
+          } catch (e) {
+            console.error('Error parsing STORED_REMINDERS. Defaulting to an empty array.', e);
+          }
+        }
+        let currentSheetIndex = parseInt(this.scriptProperties.getProperty(SCRIPT_PROPERTY_KEY_CURRENT_SHEET_INDEX) || '0');
+        let today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        for (let i = currentSheetIndex; i < sheets.length; i++) {
+          let sheet = sheets[i];
+          let sheetName = sheet.getName();
+
+          // Simulate a long-running process for testing purposes by sleeping for 10 seconds
+          // Utilities.sleep(10000);
+          
+          // Check elapsed time, if more than 5 minutes (290 seconds for a buffer), save progress and exit
+          // On timeout, trigger sendGeneralReminder
+          if ((new Date().getTime() - startTime) > 290 * 1000) {
+            this.scriptProperties.setProperty(SCRIPT_PROPERTY_KEY_CURRENT_SHEET_INDEX, i.toString());
+            this.scriptProperties.setProperty(SCRIPT_PROPERRY_KEY_STORED_REMINDERS,JSON.stringify(this.reminderData));
+            console.log(`Timeout detected in getReminders, and the top level function using this method will be executed in 30 seconds`);
+            this.scriptProperties.setProperty(SCRIPT_PROPERRY_KEY_COMPLETION_STATUS,'NOT YET');
+
+            if(this.period === 'today' && this.target === 'general'){
+              ScriptApp.newTrigger('runGeneralReminderToday').timeBased().after(30000).create();
+              return;
+            } else if(this.period === 'week' && this.target === 'general'){
+              ScriptApp.newTrigger('runGeneralReminderNextWeek').timeBased().after(30000).create();
+              return;
+            } else if(this.period === 'today' && this.target === 'staffBased'){
+              ScriptApp.newTrigger('runStaffReminderToday').timeBased().after(30000).create();
+              return;
+            } else if(this.period === 'week' && this.target === 'staffBased'){
+              ScriptApp.newTrigger('runStaffReminderNextWeek').timeBased().after(30000).create();
+              return;
+            }
+            
+          } else {
+            console.log(`Execusion continues when reading the data in ${sheetName}`);
+          }
+
+          if (sheetName !== ONGOING_TASKS_INDEX_SHEET_NAME && sheetName !== COMPLETED_TASKS_INDEX_SHEET_NAME) {
+
+            let lastRow = sheet.getRange("B" + sheet.getMaxRows()).getNextDataCell(SpreadsheetApp.Direction.UP).getRow();
+            let lastCol = sheet.getLastColumn();
+            // console.log(`The number of the data in ${sheetName} is ${lastRow}`);
+
+            if (lastRow ===0  || lastRow === 1 && lastCol === 0){
+              continue;
+            }
+            // Retrieve data up to the last filled cell in column B
+            let data = sheet.getRange(1, 1, lastRow, lastCol).getValues();
+            let taskData = [];
+
+            let validDates = [new Date(today)]; // Today is always a valid date
+            let nextDate = new Date(today.getTime()); // Start with the base date
+
+            for (let i = 1; i <= 5; i++) {
+                nextDate.setDate(nextDate.getDate() + 1); // Increment by one day initially
+
+                while (nextDate.getDay() === 0 || nextDate.getDay() === 6) {
+                    nextDate.setDate(nextDate.getDate() + 1); // Skip weekends
+                }
+
+                validDates.push(new Date(nextDate.getTime())); // Add the valid date to the array
+            }
+          
+            for (let i = 1; i < data.length; i++) {
+              let checkbox = data[i][5];
+              let staff = data[i][4];
+              let dateStr = data[i][3];
+              // console.log(`dateStr is ${dateStr}`);
+              // If dateStr is empty, skip the current iteration
+              if (!dateStr) {
+                  // console.log(`Date is not input for this event, which is not subject to the reminder.`);
+                  continue;
+              }
+              let dateInfo = ReminderManager.formatJapaneseDate(dateStr);
+              let item = data[i][1];
+              let note = data[i][2];
+              
+              let date = new Date(dateStr);
+              
+              let isFutureValidDate = validDates.some(function(validDate) {
+                return validDate.getTime() === date.getTime();
+              });
+              
+              if (this.period === 'today'){
+                if (!checkbox && date <= today) {
+                  taskData.push(new Reminder(item, note, dateInfo, staff));
+                  // console.log(`remiderRecords for ${sheetName} are ${taskData}`)
+                }
+              } else if (this.period === 'week'){
+                if (!checkbox && (date <= today || isFutureValidDate)) {
+                  taskData.push(new Reminder(item, note, dateInfo, staff));
+                }
+              }
+            }
+
+            if (taskData.length > 0) {
+              let sheetGID = sheet.getSheetId();
+              let spreadsheetURL = this.ss.getUrl();
+              let sheetURL = spreadsheetURL + "#gid=" + sheetGID;
+              this.reminderData.push(new SheetReminder(sheet.getName(), sheetURL, taskData));
+            }
+          }
+        }
+        console.log('Completed processing all sheets in getReminderData and ready to send a reminder.');
+        this.scriptProperties.deleteProperty('CURRENT_SHEET_INDEX');
+        this.scriptProperties.deleteProperty('STORED_REMINDERS');
+        this.scriptProperties.setProperty(SCRIPT_PROPERRY_KEY_COMPLETION_STATUS,'COMPLETED');
+
+        return this.reminderData;
+    }
+
+
+    shareRemindersByDoc() {
+        try {
+          let reminderData = this.getReminderData();
+          let completionStatus = this.scriptProperties.getProperty(SCRIPT_PROPERRY_KEY_COMPLETION_STATUS);
+
+          if (completionStatus === 'NOT YET') {
+              console.log(`It is still in the middle of getting reminder data by getReminders`);
+              return;
+          } else if (completionStatus === 'COMPLETED') {
+              if (reminderData.length === 0) {
+                  console.log(`There is no reminder data to display.`);
+                  return;
+              }
+              console.log('Start creating reminder doc.');
+              let docId, docTitle, body, displayDocUrl, title, successOrFailure;
+
+              let generalReminderEmails = JSON.parse(this.scriptProperties.getProperty(SCRIPT_PROPERTY_KEY_GENERAL_REMINDER_EMAILS));
+              let generalReminderDocsUrls = JSON.parse(this.scriptProperties.getProperty(SCRIPT_PROPERTY_KEY_GENERAL_REM_DOC_URL));
+              let staffBasedReminderData = JSON.parse(this.scriptProperties.getProperty(SCRIPT_PROPERTY_KEY_STAFFBASED_REM_DATA));
+              /*
+              If staffBasedReminderData is not set, it is null.
+              If staffBasedReminderData is set, it is as follows:
+              [
+                {
+                  "AA": {
+                    "email": "aa@demo.co.jp",
+                    "todayReminderUrl": "xxx",
+                    "nextWeekReminderUrl": null
+                  }
+                },
+                {
+                  "BB": {
+                    "email": "bb@demo.co.jp",
+                    "todayReminderUrl": "xxx",
+                    "nextWeekReminderUrl": null
+                  }
+                }
+              ];
+              */
+
+              // Send an email based on period and target
+              if (this.target === 'general'){
+                if(generalReminderEmails !== null && generalReminderDocsUrls !== null) {
+                  let generalTodayReminderDocUrl = generalReminderDocsUrls.generalTodayReminderDocUrl;
+                  let generalWeekReminderDocUrl = generalReminderDocsUrls.generalWeekReminderDocUrl;
+
+                    if(this.period === 'today'){
+                      title = `Today's General Reminder on ${ReminderManager.formatJapaneseDate(new Date())}`;
+                      if(generalTodayReminderDocUrl !== null){
+                        docId = ReminderManager.extractDocIdFromUrl(generalTodayReminderDocUrl);
+                        body = this.presetInDoc(docId, title);
+                        this.createReminderTablesInDoc(body, reminderData);
+                        displayDocUrl = generalTodayReminderDocUrl;
+                        successOrFailure = "success";
+                        this.sendEmail(generalReminderEmails,title,successOrFailure,displayDocUrl);
+                        console.log(`Today's general reminders were successfully shared by email.`);
+                        return;
+                      } else {
+                        successOrFailure = "failure";
+                        this.sendEmail(generalReminderEmails,title,successOrFailure);
+                        console.log(`Today's general reminders could not be shared since the Google Doc is not set, which was informed by email.`);
+                        return;
+                      }
+                    } else if(this.period === 'week') {
+                      title = `Next Week's General Reminder on ${ReminderManager.formatJapaneseDate(new Date())}`;
+                      if(generalWeekReminderDocUrl !== null){
+                        docId = ReminderManager.extractDocIdFromUrl(generalWeekReminderDocUrl);
+                        body = this.presetInDoc(docId, docTitle);
+                        this.createReminderTablesInDoc(body, reminderData);
+                        successOrFailure = "success";
+                        this.sendEmail(generalReminderEmails,title,successOrFailure,displayDocUrl);
+                        console.log(`Next week's general reminders were successfully shared by email.`);
+                        return;
+                      } else {
+                        successOrFailure = "failure";
+                        this.sendEmail(generalReminderEmails,title,successOrFailure);
+                        console.log(`Next week's general reminders could not be shared since the Google Doc is not set, which was informed by email.`);
+                        return;
+                      }
+                    }
+                } else {
+                    let email = Session.getActiveUser().getEmail();
+                    let body = `Necessary information such as emails and Google Doc URLs is not set in the setting. Go to "Setting" from Custom Menu and conduct necessary setting.`;
+                    let subject = "Error on Sharing General Reminders (Today or Next Week)";
+                    console.log(`Error on Sharing General Reminders (Today or Next Week).`);
+                    GmailApp.sendEmail(email,subject,body);
+                    return;
+                }
+              }
+
+              if(this.target === 'staffBased'){
+                if(staffBasedReminderData !== null) {
+                  staffBasedReminderData.forEach(staffObject => {
+                    let staffName = Object.keys(staffObject)[0];
+                    let staffInfo = staffObject[staffName];
+                    let email = staffInfo.email;
+                    let staffSpecificReminders;
+
+                    if(this.period === 'today'){
+                      title = `Today's Reminder for ${staffName} on ${ReminderManager.formatJapaneseDate(new Date())}`;
+                      if(staffInfo.todayReminderUrl){
+                        docId = ReminderManager.extractDocIdFromUrl(staffInfo.todayReminderUrl);
+                        body = this.presetInDoc(docId, title);
+                        staffSpecificReminders = this.filterRemindersForStaff(reminderData, staffName);
+                        this.createReminderTablesInDoc(body, staffSpecificReminders);
+                        displayDocUrl = staffInfo.todayReminderUrl;
+                        successOrFailure = "success";
+                        this.sendEmail(email,title,successOrFailure,displayDocUrl);
+                        console.log(`Today's reminders were successfully shared with ${staffName} by email.`);
+                        return;
+                      } else {
+                        successOrFailure = "failure";
+                        this.sendEmail(email,title,successOrFailure);
+                        console.log(`Today's reminders could not be shared with ${staffName} since the Google Doc is not set, which was informed by email.`);
+                        return;
+                      }
+                    } else if (this.period === 'week'){
+                      if(staffInfo.nextWeekReminderUrl){
+                        docId = ReminderManager.extractDocIdFromUrl(staffInfo.nextWeekReminderUrl);
+                        body = this.presetInDoc(docId, title);
+                        staffSpecificReminders = this.filterRemindersForStaff(reminderData, staffName);
+                        this.createReminderTablesInDoc(body, staffSpecificReminders);
+                        displayDocUrl = staffInfo.nextWeekReminderUrl;
+                        successOrFailure = "success";
+                        this.sendEmail(email,title,successOrFailure,displayDocUrl);
+                        console.log(`Next week's reminders were successfully shared with ${staffName} by email.`);
+                      } else {
+                        successOrFailure = "failure";
+                        this.sendEmail(email,title,successOrFailure);
+                        console.log(`Next week's reminders could not be shared with ${staffName} since the Google Doc is not set, which was informed by email.`);
+                        return;
+                      }
+                    }
+                  });
+                } else {
+                    let email = Session.getActiveUser().getEmail();
+                    let body = `Necessary information such as emails and Google Doc URLs is not set in the setting. Go to "Setting" from Custom Menu and conduct necessary setting.`;
+                    let subject = "Error on Sharing General Reminders (Today or Next Week)";
+                    console.log(`Error on Sharing General Reminders (Today or Next Week).`);
+                    GmailApp.sendEmail(email,subject,body);
+                    return;
+                }
+              }
+          }
+        } catch (e) {
+            console.error(`Error in displayRemindersInDoc: ${e.toString()} at ${e.stack}`);
+        }
+    }
+
+
+    presetInDoc(docId, docTitle) {
+        let doc = DocumentApp.openById(docId);
+        let body = doc.getBody();
+        body.clear();
+        doc.setName(docTitle);
+        
+        if (this.period === 'today') {
+            let introParagraph = body.appendParagraph("*タスクを完了したら、完了欄に「完了」と記載!");
+            introParagraph.editAsText().setForegroundColor("#FF0000");
+            introParagraph.setBold(false);
+        }
+
+        return body;
+    }
+
+    createReminderTablesInDoc(body, reminderData) {
+        reminderData.forEach(sheetReminder => {
+            let title = body.appendParagraph(sheetReminder.sheetName);
+            title.setHeading(DocumentApp.ParagraphHeading.HEADING1);
+            title.setLinkUrl(sheetReminder.sheetURL);
+            title.setBold(true).setFontSize(12);
+
+            // Define headers based on period
+            let headers = this.period === 'today' ? ["項目", "概要", "日付", "担当", "完了"] : ["項目", "備考", "日付", "担当"];
+            this.createEachTable(body, sheetReminder.taskData, headers);
+        });
+    }
+
+    createEachTable(body, taskData, headers) {
+        let numRows = taskData.length + 1; // +1 for header row
+        let numCols = headers.length;
+        let table = body.appendTable(new Array(numRows).fill(0).map(row => new Array(numCols).fill('')));
+
+            // Format the header row
+            let columnWidths = [200, 300, 100, 60, 50];  // Adjust this if needed
+            let headerRow = table.getRow(0);
+            for (let i = 0; i < headers.length; i++) {
+                headerRow.getCell(i).setText(headers[i]).setWidth(columnWidths[i]).setBold(true).setFontSize(10);
+            }
+
+            // Fill in the table content
+            for (let i = 0; i < taskData.length; i++) {
+                table.getRow(i + 1).getCell(0).setText(taskData[i].item).setPaddingLeft(10).setBold(false).setFontSize(10);
+                table.getRow(i + 1).getCell(1).setText(taskData[i].note).setPaddingLeft(10).setBold(false).setFontSize(10);
+                table.getRow(i + 1).getCell(2).setText(taskData[i].date).setPaddingLeft(10).setBold(false).setFontSize(10);
+                table.getRow(i + 1).getCell(3).setText(taskData[i].staff).setPaddingLeft(10).setBold(false).setFontSize(10);
+                
+                // Only add completion status if the column exists
+                if (numCols > 4) {
+                    table.getRow(i + 1).getCell(4).setText("").setPaddingLeft(10).setBold(false).setFontSize(10);
+                }
+            }
+    }
+
+    sendEmail(email,subject,successOrFailure,displayDocUrl){
+        let template = HtmlService.createTemplateFromFile('reminder-share-email');
+        template.displayDocUrl = displayDocUrl;
+        template.period = this.period;
+        template.successOrFailure = successOrFailure;
+        if(successOrFailure === "failure"){
+          template.type = this.type;
+          template.target = this.target;
+          template.spreadSheetUrl = this.ss.getUrl();
+        }
+        let htmlBody = template.evaluate().getContent();
+        GmailApp.sendEmail(email,subject,"",{
+            htmlBody: htmlBody,
+        });
+    }
+    
+  // This function should be a method inside the ReminderManager class
+  filterRemindersForStaff(reminderData, staffName) {
+    // Filter and map the reminders for the specific staff
+    return reminderData.filter(sheetReminder => {
+      // Check if the tasks array exists and has tasks assigned to the staff
+      return sheetReminder.taskData.some(task => task.staff === staffName);
+    }).map(sheetReminder => {
+      // Return a new SheetReminder with only the tasks for this staff
+      return new SheetReminder(
+        sheetReminder.sheetName,
+        sheetReminder.sheetURL,
+        sheetReminder.taskData.filter(task => task.staff === staffName)
+      );
+    });
+  }
+
+    /**
+     * Deletes displayed reminders in the Google Document.
+     */
+    deleteRemindersInDoc(){
+      let docId;
+      let doc;
+      if(this.period === 'today' && this.target === 'general'){
+          docId = ReminderManager.extractDocIdFromUrl(TODAY_REM_DOC_URL);
+          doc = DocumentApp.openById(docId);
+          doc.getBody().clear();
+      } else if (this.period === 'today' && this.target === 'staffBased'){
+          return;
+      }
+    }
+
+}
+
+// Usage functions:
+/**
+ * Displays the general reminder for today in the Google Doc and send an email as a reminder with the link to the Doc.
+ * 
+ */
+function runGeneralReminderToday() {
+  let generalReminderToday = new ReminderManager('general', 'today');
+  generalReminderToday.shareRemindersByDoc();
+}
+
+/**
+ * Displays the general reminder for next week in the Google Doc and send an email as a reminder with the link to the Doc.
+ */
+function runGeneralReminderNextWeek() {
+  let generalReminderNextWeek = new ReminderManager('general', 'week');
+  generalReminderNextWeek.shareRemindersByDoc();
+}
+
+/**
+ * Triggers staff-based reminders for the week.
+ */
+function runStaffReminderToday() {
+    let staffReminderToday = new ReminderManager('staffBased', 'today');
+    staffReminderToday.shareRemindersByDoc();
+}
+/**
+ * Triggers staff-based reminders for the week.
+ */
+function runStaffReminderNextWeek() {
+    let staffReminderWeek = new ReminderManager('staffBased', 'week');
+    staffReminderWeek.shareRemindersByDoc();
+}
+
+/**
+ * Deletes displayed today's reminders in the Google Doc.
+ */
+function deleteDisplayedRemindersInDoc(){
+  let generalReminderToday = new ReminderManager('general','today');
+  generalReminderToday.deleteRemindersInDoc();
+}
