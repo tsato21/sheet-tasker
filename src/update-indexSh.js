@@ -1,4 +1,7 @@
-// Function to update both ongoing and completed task index sheets
+/**
+ * Updates index sheets for ongoing and completed tasks.
+ * This function organizes tasks into categories and updates the corresponding index sheets.
+ */
 function updateAllTaskIndexSheets() {
   // Global letiables
   let ss = SpreadsheetApp.getActiveSpreadsheet();
@@ -19,8 +22,8 @@ function updateAllTaskIndexSheets() {
         let sheetURL = `${ss.getUrl()}#gid=${sheetGID}`;
         let taskInfo = { url: sheetURL };
 
-        if (sheetName.includes("完了")) {
-          [category, task] = sheetName.replace("完了)", "").split(":").map(part => part.trim());
+        if (sheetName.includes("Fin")) {
+          [category, task] = sheetName.replace("Fin)", "").split(":").map(part => part.trim());
           completedTasks[category] = completedTasks[category] || [];
           taskInfo.task = task;
           completedTasks[category].push(taskInfo);
@@ -46,11 +49,18 @@ function updateAllTaskIndexSheets() {
 }
 
 
-// Function to update a specific sheet with task data
+/**
+ * Updates a specified sheet with task data, formatting, and hyperlinks.
+ * It adjusts the number of columns as needed and applies formatting to display tasks categorically.
+ * 
+ * @param {GoogleAppsScript.Spreadsheet.Sheet} sheetToUpdate - The sheet to be updated with task data.
+ * @param {Object} categoryData - An object containing task data categorized.
+ * @param {string} tabColor - The color code for the sheet's tab.
+ */
 function updateSheetWithTaskData(sheetToUpdate, categoryData, tabColor) {
   sheetToUpdate.clear();
   let lastColNum = sheetToUpdate.getMaxColumns();
-  let needColNum = Object.keys(categoryData).length * 2 + 1;  // Each category requires 2 columns (the first column is for data insertion and the second one is for space between the inserted data and the next data) "+1" is for the column A (the one for set buttons to execute functions)
+  let needColNum = Object.keys(categoryData).length;
 
   // Log current status
   // console.log(`${sheetToUpdate.getSheetName()}: lastColNum is ${lastColNum}, needColNum is ${needColNum}`);
@@ -63,7 +73,7 @@ function updateSheetWithTaskData(sheetToUpdate, categoryData, tabColor) {
     // console.log(`${columnsToInsert} columns were inserted.`);
   }
 
-  let currentCol = 2;
+  let currentCol = 1;
   for (let category in categoryData) {
       let updates = [];
       updates.push([category]);
@@ -92,9 +102,7 @@ function updateSheetWithTaskData(sheetToUpdate, categoryData, tabColor) {
                                                     .setHorizontalAlignment("center");
       
       sheetToUpdate.setColumnWidth(currentCol, 150);
-      sheetToUpdate.setColumnWidth(currentCol + 1, 30);
-
-      currentCol += 2;
+      currentCol += 1;
     }
 
     // Setting the tab color of the target sheet
@@ -102,7 +110,13 @@ function updateSheetWithTaskData(sheetToUpdate, categoryData, tabColor) {
   
 }
 
-
+/**
+ * Sorts a given task sheet by date.
+ * Only sorts sheets that are not index sheets and have more than one row of data.
+ * 
+ * @param {GoogleAppsScript.Spreadsheet.Sheet} sheet - The task sheet to be sorted.
+ * @param {string} sheetName - The name of the sheet.
+ */
 function sortTaskSheetByDate(sheet, sheetName) {
   let lastRow = sheet.getLastRow();
   let lastCol = sheet.getLastColumn();

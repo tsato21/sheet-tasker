@@ -91,45 +91,64 @@
     <input type="button" class="close-button" value="Close" onclick="google.script.host.close();">
 
     <script>
-        // Pass the staff data from the Apps Script to the frontend
-        let existingStaff = JSON.parse('<?= JSON.stringify(existingStaff) ?>');
-        console.log(existingStaff);
-        let staffList = document.getElementById('staffList');
+      // This script tag contains JavaScript code to interact with Google Apps Script server-side functions.
 
-        existingStaff.forEach(staff => {
-            let row = document.createElement('tr');
+      /**
+       * Retrieves staff data from server-side and displays it in a table.
+       * It parses the passed JSON string to an array and dynamically creates table rows.
+       */
+      let existingStaff = JSON.parse('<?= JSON.stringify(existingStaff) ?>');
+      console.log(existingStaff);
+      let staffList = document.getElementById('staffList');
 
-            let nameCell = document.createElement('td');
-            nameCell.textContent = staff.name;
-            nameCell.className = 'name';
+      existingStaff.forEach(staff => {
+          let row = document.createElement('tr');
 
-            let emailCell = document.createElement('td');
-            emailCell.textContent = staff.email;
-            emailCell.className = 'email';
+          let nameCell = document.createElement('td');
+          nameCell.textContent = staff.name;
+          nameCell.className = 'name';
 
-            row.appendChild(nameCell);
-            row.appendChild(emailCell);
+          let emailCell = document.createElement('td');
+          emailCell.textContent = staff.email;
+          emailCell.className = 'email';
 
-            staffList.appendChild(row);
-        });
+          row.appendChild(nameCell);
+          row.appendChild(emailCell);
 
-        function showSettingModal(){
-          google.script.run
-                    .withSuccessHandler(closeDialog)
-                    .withFailureHandler(handleFailure)
-                    .showSettingListsModal();
-        }
+          staffList.appendChild(row);
+      });
 
-        function handleFailure(error) {
-          console.error("An error occurred: " + error);
-          alert("An error occurred: " + error);
-        }
-        
-        function closeDialog() {
-          google.script.host.close();
-        }
+      /**
+       * Calls a Google Apps Script server-side function to display the settings modal.
+       * This function is triggered by the 'Go to Setting' button.
+       */
+      function showSettingModal(){
+        google.script.run
+                  .withSuccessHandler(closeDialog)
+                  .withFailureHandler(handleFailure)
+                  .showSettingListsModal();
+      }
+
+      /**
+       * Handles failures in server-side script execution.
+       * Displays an error message to the user.
+       *
+       * @param {Object} error - The error object returned from the server-side script.
+       */
+      function handleFailure(error) {
+        console.error("An error occurred: " + error);
+        alert("An error occurred: " + error);
+      }
+
+      /**
+       * Closes the dialog or web app.
+       * This function is used as a success handler in server-side function calls.
+       */
+      function closeDialog() {
+        google.script.host.close();
+      }
     </script>
 
-</body>
+  </body>
 
 </html>

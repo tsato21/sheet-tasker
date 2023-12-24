@@ -109,7 +109,7 @@
         </tr>
         <tr>
             <td class="type-cell">Staff for General Reminder</td>
-            <td class="description-cell">Specify staff to receive general reminder emails.</td>
+            <td class="description-cell">Specify email(s) of staff to receive general reminder.</td>
             <td class="button-cell">
                 <? if (isGeneralReminderEmailPropertyKey) { ?>
                     <button class="update-button" onclick="proceedSetting('setGeneralReminderEmails')">Update</button>
@@ -219,8 +219,8 @@
             <th>Action</th>
         </tr>
         <tr>
-            <td class="type-cell">Trigger to integrate Completion Status in Reminder Docs with Management Spreadsheet</td>
-            <td class="description-cell">Check the complettion status in Docs and update management Spreadsheet (unchecked to checked).</td>
+            <td class="type-cell">Trigger to Update Completion Status for Tasks</td>
+            <td class="description-cell">Transfer completion status from reminder docs into spreadsheet (unchecked to checked).<br>【Trigger Details】Time-drive/ Daily timer/ 5pm</td></td>
             <td class="button-cell">
                 <? if (isUpdateCompletionStatusToSheet) { ?>
                     <button class="delete-button" onclick="proceedSetting('deleteUpdateCompletionStatusToSheetTrigger')">Delete</button>
@@ -232,113 +232,130 @@
     </table>
 
     <script>
-        function proceedSetting(settingType,scriptyPropertyKey) {
-            // Call your server-side function based on the value here
+      /**
+       * Function to handle settings based on user interaction.
+       * This function is triggered when a setting button is clicked, and it calls the corresponding Google Apps Script server-side function.
+       * 
+       * @param {string} settingType - The type of setting to be processed.
+       * @param {string} [scriptyPropertyKey=""] - The key associated with the setting in the script properties, if applicable.
+       */
+      function proceedSetting(settingType,scriptyPropertyKey) {
+          // Call your server-side function based on the value here
 
-            /*
-            For Staff of this Spreadsheet
-            */
-            if (settingType === 'setStaff') {
-                google.script.run.withSuccessHandler(closeDialog).withFailureHandler(handleFailure).setStaffInfo();
-                return;
-            } else if (settingType === 'resetStaff') {
-                google.script.run.withSuccessHandler(closeDialog).withFailureHandler(handleFailure).deleteDesignatedScriptProperty(settingType,scriptyPropertyKey);
-                return;
-            } else if (settingType === 'updateStaff') {
-                google.script.run.withSuccessHandler(closeDialog).withFailureHandler(handleFailure).updateStaffInfoModal();
-                return;
-            }
+          /*
+          For Staff of this Spreadsheet
+          */
+          if (settingType === 'setStaff') {
+              google.script.run.withSuccessHandler(closeDialog).withFailureHandler(handleFailure).setStaffInfo();
+              return;
+          } else if (settingType === 'resetStaff') {
+              google.script.run.withSuccessHandler(closeDialog).withFailureHandler(handleFailure).deleteDesignatedScriptProperty(settingType,scriptyPropertyKey);
+              return;
+          } else if (settingType === 'updateStaff') {
+              google.script.run.withSuccessHandler(closeDialog).withFailureHandler(handleFailure).updateStaffInfoModal();
+              return;
+          }
 
-            /*
-            For General Reminder
-            */
-            //Emails to send the reminder
-            if (settingType === 'setGeneralReminderEmails') {
-                google.script.run.withSuccessHandler(closeDialog).withFailureHandler(handleFailure).showGeneralReminderEmailsModal();
-                return;
-            } else if (settingType === 'resetGeneralReminderEmails') {
-                google.script.run.withSuccessHandler(closeDialog).withFailureHandler(handleFailure).deleteDesignatedScriptProperty(settingType,scriptyPropertyKey);
-                return;
-            }
-           //Docs to display the general reminder
-            if (settingType === 'setGeneralReminderDocURLs') {
-                google.script.run.withSuccessHandler(closeDialog).withFailureHandler(handleFailure).showUrlModal();
-                return;
-            } else if (settingType === 'resetGeneralReminderDocURLs') {
-                google.script.run.withSuccessHandler(closeDialog).withFailureHandler(handleFailure).deleteDesignatedScriptProperty(settingType,scriptyPropertyKey);
-                return;
-            }
-            //Trigger to send the today's reminder
-            if (settingType === 'setGeneralReminderTodayTrigger') {
-                google.script.run.withSuccessHandler(closeDialog).withFailureHandler(handleFailure).setReminderTrigger('runGeneralReminderToday');
-                return;
-            } else if (settingType === 'deleteGeneralReminderTodayTrigger') {
-                google.script.run.withSuccessHandler(closeDialog).withFailureHandler(handleFailure).deleteReminderTrigger('runGeneralReminderToday');
-                return;
-            }
-            //Trigger to send the next week's reminder
-            if (settingType === 'setGeneralReminderNextWeekTrigger') {
-                google.script.run.withSuccessHandler(closeDialog).withFailureHandler(handleFailure).setReminderTrigger('runGeneralReminderNextWeek');
-                return;
-            } else if (settingType === 'deleteGeneralReminderNextWeekTrigger') {
-                google.script.run.withSuccessHandler(closeDialog).withFailureHandler(handleFailure).deleteReminderTrigger('runGeneralReminderNextWeek');
-                return;
-            }
+          /*
+          For General Reminder
+          */
+          //Emails to send the reminder
+          if (settingType === 'setGeneralReminderEmails') {
+              google.script.run.withSuccessHandler(closeDialog).withFailureHandler(handleFailure).showGeneralReminderEmailsModal();
+              return;
+          } else if (settingType === 'resetGeneralReminderEmails') {
+              google.script.run.withSuccessHandler(closeDialog).withFailureHandler(handleFailure).deleteDesignatedScriptProperty(settingType,scriptyPropertyKey);
+              return;
+          }
+          //Docs to display the general reminder
+          if (settingType === 'setGeneralReminderDocURLs') {
+              google.script.run.withSuccessHandler(closeDialog).withFailureHandler(handleFailure).showUrlModal();
+              return;
+          } else if (settingType === 'resetGeneralReminderDocURLs') {
+              google.script.run.withSuccessHandler(closeDialog).withFailureHandler(handleFailure).deleteDesignatedScriptProperty(settingType,scriptyPropertyKey);
+              return;
+          }
+          //Trigger to send the today's reminder
+          if (settingType === 'setGeneralReminderTodayTrigger') {
+              google.script.run.withSuccessHandler(closeDialog).withFailureHandler(handleFailure).setReminderTrigger('runGeneralReminderToday');
+              return;
+          } else if (settingType === 'deleteGeneralReminderTodayTrigger') {
+              google.script.run.withSuccessHandler(closeDialog).withFailureHandler(handleFailure).deleteReminderTrigger('runGeneralReminderToday');
+              return;
+          }
+          //Trigger to send the next week's reminder
+          if (settingType === 'setGeneralReminderNextWeekTrigger') {
+              google.script.run.withSuccessHandler(closeDialog).withFailureHandler(handleFailure).setReminderTrigger('runGeneralReminderNextWeek');
+              return;
+          } else if (settingType === 'deleteGeneralReminderNextWeekTrigger') {
+              google.script.run.withSuccessHandler(closeDialog).withFailureHandler(handleFailure).deleteReminderTrigger('runGeneralReminderNextWeek');
+              return;
+          }
 
 
-            /*
-            For Staff Based Reminder
-            */
-            //Staff to send the staff-based reminder
-            if (settingType === 'setDesignatedStaff') {
-                google.script.run.withSuccessHandler(closeDialog).withFailureHandler(handleFailure).showDesignatedStaffModal();
-                return;
-            } else if (settingType === 'resetDesignatedStaff') {
-                google.script.run.withSuccessHandler(closeDialog).withFailureHandler(handleFailure).deleteDesignatedScriptProperty(settingType,scriptyPropertyKey);
-                return;
-            }
-            //Docs to display the staff-based reminder
-            if (settingType === 'setStaffBasedReminderDocURLs') {
-                google.script.run.withSuccessHandler(closeDialog).withFailureHandler(handleFailure).showUrlModal();
-                return;
-            } else if (settingType === 'resetStaffBasedReminderDocURLs') {
-                google.script.run.withSuccessHandler(closeDialog).withFailureHandler(handleFailure).deleteDesignatedScriptProperty(settingType,scriptyPropertyKey);
-                return;
-            }
-            //Trigger to send the today's reminder
-            if (settingType === 'setStaffReminderTodayTrigger') {
-                google.script.run.withSuccessHandler(closeDialog).withFailureHandler(handleFailure).setReminderTrigger('runStaffReminderToday');
-            } else if (settingType === 'deleteStaffReminderTodayTrigger') {
-                google.script.run.withSuccessHandler(closeDialog).withFailureHandler(handleFailure).deleteReminderTrigger('runStaffReminderToday');
-            }
-            //Trigger to send the next week's reminder
-            if (settingType === 'setStaffReminderNextWeekTrigger') {
-                google.script.run.withSuccessHandler(closeDialog).withFailureHandler(handleFailure).setReminderTrigger('runStaffReminderNextWeek');
-            } else if (settingType === 'deleteStaffReminderNextWeekTrigger') {
-                google.script.run.withSuccessHandler(closeDialog).withFailureHandler(handleFailure).deleteReminderTrigger('runStaffReminderNextWeek');
-            }
+          /*
+          For Staff Based Reminder
+          */
+          //Staff to send the staff-based reminder
+          if (settingType === 'setDesignatedStaff') {
+              google.script.run.withSuccessHandler(closeDialog).withFailureHandler(handleFailure).showDesignatedStaffModal();
+              return;
+          } else if (settingType === 'resetDesignatedStaff') {
+              google.script.run.withSuccessHandler(closeDialog).withFailureHandler(handleFailure).deleteDesignatedScriptProperty(settingType,scriptyPropertyKey);
+              return;
+          }
+          //Docs to display the staff-based reminder
+          if (settingType === 'setStaffBasedReminderDocURLs') {
+              google.script.run.withSuccessHandler(closeDialog).withFailureHandler(handleFailure).showUrlModal();
+              return;
+          } else if (settingType === 'resetStaffBasedReminderDocURLs') {
+              google.script.run.withSuccessHandler(closeDialog).withFailureHandler(handleFailure).deleteDesignatedScriptProperty(settingType,scriptyPropertyKey);
+              return;
+          }
+          //Trigger to send the today's reminder
+          if (settingType === 'setStaffReminderTodayTrigger') {
+              google.script.run.withSuccessHandler(closeDialog).withFailureHandler(handleFailure).setReminderTrigger('runStaffReminderToday');
+          } else if (settingType === 'deleteStaffReminderTodayTrigger') {
+              google.script.run.withSuccessHandler(closeDialog).withFailureHandler(handleFailure).deleteReminderTrigger('runStaffReminderToday');
+          }
+          //Trigger to send the next week's reminder
+          if (settingType === 'setStaffReminderNextWeekTrigger') {
+              google.script.run.withSuccessHandler(closeDialog).withFailureHandler(handleFailure).setReminderTrigger('runStaffReminderNextWeek');
+          } else if (settingType === 'deleteStaffReminderNextWeekTrigger') {
+              google.script.run.withSuccessHandler(closeDialog).withFailureHandler(handleFailure).deleteReminderTrigger('runStaffReminderNextWeek');
+          }
 
-            /*
-            Others
-            */
-            //Trigger to update completion status from Docs into Sheet
-            if (settingType === 'setUpdateCompletionStatusToSheetTrigger') {
-                google.script.run.withSuccessHandler(closeDialog).withFailureHandler(handleFailure).setReminderTrigger('updateCompletionStatusToSheet');
-            } else if (settingType === 'deleteUpdateCompletionStatusToSheetTrigger') {
-                google.script.run.withSuccessHandler(closeDialog).withFailureHandler(handleFailure).deleteReminderTrigger('updateCompletionStatusToSheet');
-            }
-            
-        }
+          /*
+          Others
+          */
+          //Trigger to update completion status from Docs into Sheet
+          if (settingType === 'setUpdateCompletionStatusToSheetTrigger') {
+              google.script.run.withSuccessHandler(closeDialog).withFailureHandler(handleFailure).setReminderTrigger('updateCompletionStatusToSheet');
+          } else if (settingType === 'deleteUpdateCompletionStatusToSheetTrigger') {
+              google.script.run.withSuccessHandler(closeDialog).withFailureHandler(handleFailure).deleteReminderTrigger('updateCompletionStatusToSheet');
+          }
+          
+      }
 
-        function closeDialog() {
-          google.script.host.close();
-        }
+      /**
+       * Closes the dialog or web app.
+       * This function is used as a success handler in server-side function calls.
+       */
+      function closeDialog() {
+        google.script.host.close();
+      }
 
-        function handleFailure(error) {
-          console.error("An error occurred: " + error);
-          alert("An error occurred: " + error);
-        }
+      /**
+       * Handles failures in server-side script execution.
+       * Displays an error message to the user.
+       *
+       * @param {Object} error - The error object returned from the server-side script.
+       */
+      function handleFailure(error) {
+        console.error("An error occurred: " + error);
+        alert("An error occurred: " + error);
+      }
     </script>
 
-</body>
+  </body>
 </html>

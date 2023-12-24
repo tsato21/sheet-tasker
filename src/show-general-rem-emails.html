@@ -96,8 +96,14 @@
     <input type="button" class="close-button" value="Close" onclick="google.script.host.close();">
    </div> <!-- End of wrapper div -->
 
-  <script>
-      // Pass the staff data from the Apps Script to the frontend
+    <script>
+
+      // This script contains JavaScript code to interact with Google Apps Script server-side functions and manage UI elements.
+      /**
+       * Parses and displays existing staff and general reminder emails data in a table.
+       * It creates a table row for each staff member with a checkbox to select them for general reminders.
+       * The checkboxes are pre-checked if the staff email is already in the list of general reminder emails.
+       */
       const existingStaff = JSON.parse('<?= JSON.stringify(existingStaff) ?>');
       const generalReminderEmails = JSON.parse('<?= JSON.stringify(generalReminderEmails) ?>');
       const staffList = document.getElementById('staffList');
@@ -128,6 +134,11 @@
           staffList.appendChild(row);
       });
 
+      /**
+       * Collects updated general reminder email information and sends it to a server-side function.
+       * This function is triggered by the 'Submit' button.
+       * It checks the state of each checkbox to determine which staff emails to include in general reminders.
+       */
       function submitDesignation() {
           let checkboxes = document.querySelectorAll("#staffList input[type='checkbox']");
           let updatedGeneralReminderEmails = [];
@@ -140,9 +151,14 @@
 
           google.script.run.withSuccessHandler(closeDialog).confirmGeneralReminderEmails(updatedGeneralReminderEmails);
       }
+
+      /**
+       * Closes the dialog or web app.
+       * This function is used as a success handler in server-side function calls.
+       */
       function closeDialog() {
         google.script.host.close();
       }
-  </script>
-</body>
+    </script>
+  </body>
 </html>

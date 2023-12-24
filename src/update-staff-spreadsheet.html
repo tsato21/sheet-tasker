@@ -91,56 +91,76 @@
     <input type="button" class="close-button" value="Close" onclick="google.script.host.close();">
 
     <script>
-        // Pass the staff data from the Apps Script to the frontend
-        let existingStaff = JSON.parse('<?= JSON.stringify(existingStaff) ?>');
-        let staffList = document.getElementById('staffList');
+      // This script tag contains JavaScript code to interact with Google Apps Script server-side functions.
+      
+      /**
+       * Retrieves and displays existing staff data in a table.
+       * It parses the passed JSON string to an array and dynamically creates editable input fields for each staff member.
+       */
+      let existingStaff = JSON.parse('<?= JSON.stringify(existingStaff) ?>');
+      let staffList = document.getElementById('staffList');
 
-        existingStaff.forEach((staff, index) => {
-            let row = document.createElement('tr');
+      existingStaff.forEach((staff, index) => {
+          let row = document.createElement('tr');
 
-            let nameCell = document.createElement('td');
-            let nameInput = document.createElement('input');
-            nameInput.type = 'text';
-            nameInput.value = staff.name;
-            nameInput.className = 'name-input';
-            nameInput.dataset.index = index; // Store the index to identify which staff member is being updated
-            nameCell.appendChild(nameInput);
+          let nameCell = document.createElement('td');
+          let nameInput = document.createElement('input');
+          nameInput.type = 'text';
+          nameInput.value = staff.name;
+          nameInput.className = 'name-input';
+          nameInput.dataset.index = index; // Store the index to identify which staff member is being updated
+          nameCell.appendChild(nameInput);
 
-            let emailCell = document.createElement('td');
-            emailCell.textContent = staff.email;
-            emailCell.className = 'email';
+          let emailCell = document.createElement('td');
+          emailCell.textContent = staff.email;
+          emailCell.className = 'email';
 
-            row.appendChild(nameCell);
-            row.appendChild(emailCell);
+          row.appendChild(nameCell);
+          row.appendChild(emailCell);
 
-            staffList.appendChild(row);
-        });
+          staffList.appendChild(row);
+      });
 
-        function storeUpdatedStaffInfo() {
-            let updatedStaffInfo = existingStaff.map((staff, index) => {
-                let nameInput = document.querySelector(`.name-input[data-index="${index}"]`);
-                return {
-                    name: nameInput.value, // Updated name from input field
-                    email: staff.email    // Original email
-                };
-            });
+      /**
+       * Collects updated staff information from the input fields and sends it to a server-side function.
+       * This function is triggered by the 'Update' button.
+       * Each staff member's name can be edited, and the updated names are sent to the server.
+       */
+      function storeUpdatedStaffInfo() {
+          let updatedStaffInfo = existingStaff.map((staff, index) => {
+              let nameInput = document.querySelector(`.name-input[data-index="${index}"]`);
+              return {
+                  name: nameInput.value, // Updated name from input field
+                  email: staff.email    // Original email
+              };
+          });
 
-            google.script.run
-                  .withSuccessHandler(closeDialog)
-                  .withFailureHandler(handleFailure)
-                  .updateStaffInfo(updatedStaffInfo);
-        }
+          google.script.run
+                .withSuccessHandler(closeDialog)
+                .withFailureHandler(handleFailure)
+                .updateStaffInfo(updatedStaffInfo);
+      }
 
-        function handleFailure(error) {
-          console.error("An error occurred: " + error);
-          alert("An error occurred: " + error);
-        }
-        
-        function closeDialog() {
-          google.script.host.close();
-        }
+      /**
+       * Handles failures in server-side script execution.
+       * Displays an error message to the user.
+       *
+       * @param {Object} error - The error object returned from the server-side script.
+       */
+      function handleFailure(error) {
+        console.error("An error occurred: " + error);
+        alert("An error occurred: " + error);
+      }
+
+      /**
+       * Closes the dialog or web app.
+       * This function is used as a success handler in server-side function calls.
+       */
+      function closeDialog() {
+        google.script.host.close();
+      }
     </script>
 
-</body>
+  </body>
 
 </html>

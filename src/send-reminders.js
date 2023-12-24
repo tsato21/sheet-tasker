@@ -1,5 +1,6 @@
 /**
  * Represents a reminder with task details.
+ * Includes information about the task item, notes, due date, and assigned staff member.
  */
 class Reminder {
     constructor(item, note, date, staff) {
@@ -12,6 +13,7 @@ class Reminder {
 
 /**
  * Represents a reminder for a specific sheet.
+ * Contains the name and URL of the sheet, along with an array of Reminder objects related to tasks.
  */
 class SheetReminder {
     constructor(sheetName, sheetURL, taskData) {
@@ -23,6 +25,7 @@ class SheetReminder {
 
 /**
  * Manages reminders, including gathering, formatting, and sending.
+ * Supports reminders for general tasks or staff-based tasks, with a focus on either today or a future period (e.g., next week).
  */
 class ReminderManager {
     /**
@@ -81,8 +84,11 @@ class ReminderManager {
 
     /**
      * Gathers reminder data from the spreadsheet.
-     * @returns {Array<SheetReminder>} - Array of SheetReminder objects containing the reminder data.
-     * Example of reminderData structure:
+     * Processes each sheet to extract tasks and organize them into reminders, considering the set period (today or week) and type (general or staff-based).
+     * Handles timeouts by saving progress and scheduling a follow-up execution.
+     * 
+     * @returns {Array<SheetReminder>} An array of SheetReminder objects containing the reminder data.
+     * The structure of returns:
      *  [
      *    {
      *      sheetName: "Project A Tasks",
@@ -243,7 +249,10 @@ class ReminderManager {
         return this.reminderData;
     }
 
-
+    /**
+     * Shares reminders through a Google Document.
+     * Gathers reminder data, creates or updates a Google Document with reminder information, and sends an email notification with the document link.
+     */
     shareRemindersByDoc() {
         try {
           let reminderData = this.getReminderData();
@@ -258,7 +267,7 @@ class ReminderManager {
                   return;
               }
               console.log('Start creating reminder doc.');
-              let docId, docTitle, body, displayDocUrl, title, successOrFailure;
+              let docId, title, body, displayDocUrl, successOrFailure;
 
               let generalReminderEmails = JSON.parse(this.scriptProperties.getProperty(SCRIPT_PROPERTY_KEY_GENERAL_REMINDER_EMAILS));
               let generalReminderDocsUrls = JSON.parse(this.scriptProperties.getProperty(SCRIPT_PROPERTY_KEY_GENERAL_REM_DOC_URL));
@@ -311,8 +320,9 @@ class ReminderManager {
                       title = `Next Week's General Reminder on ${ReminderManager.formatJapaneseDate(new Date())}`;
                       if(generalWeekReminderDocUrl !== null){
                         docId = ReminderManager.extractDocIdFromUrl(generalWeekReminderDocUrl);
-                        body = this.presetInDoc(docId, docTitle);
+                        body = this.presetInDoc(docId, title);
                         this.createReminderTablesInDoc(body, reminderData);
+                        displayDocUrl = generalWeekReminderDocUrl;
                         successOrFailure = "success";
                         this.sendEmail(generalReminderEmails,title,successOrFailure,displayDocUrl);
                         console.log(`Next week's general reminders were successfully shared by email.`);
@@ -361,6 +371,7 @@ class ReminderManager {
                         return;
                       }
                     } else if (this.period === 'week'){
+                      title = `Next Week's Reminder for ${staffName} on ${ReminderManager.formatJapaneseDate(new Date())}`;
                       if(staffInfo.nextWeekReminderUrl){
                         docId = ReminderManager.extractDocIdFromUrl(staffInfo.nextWeekReminderUrl);
                         body = this.presetInDoc(docId, title);
@@ -393,7 +404,14 @@ class ReminderManager {
         }
     }
 
-
+    /**
+     * Prepares a Google Document for displaying reminders.
+     * Clears the existing content and sets a new title for the document.
+     *
+     * @param {string} docId - The ID of the Google Document.
+     * @param {string} docTitle - The new title for the document.
+     * @returns {GoogleAppsScript.Document.Body} The body element of the Google Document.
+     */
     presetInDoc(docId, docTitle) {
         let doc = DocumentApp.openById(docId);
         let body = doc.getBody();
@@ -401,7 +419,7 @@ class ReminderManager {
         doc.setName(docTitle);
         
         if (this.period === 'today') {
-            let introParagraph = body.appendParagraph("*タスクを完了したら、完了欄に「完了」と記載!");
+            let introParagraph = body.appendParagraph(`*Once the item is completed, input "C"!`);
             introParagraph.editAsText().setForegroundColor("#FF0000");
             introParagraph.setBold(false);
         }
@@ -409,6 +427,13 @@ class ReminderManager {
         return body;
     }
 
+    /**
+     * Creates tables in a Google Document for each sheet's reminder data.
+     * Each table contains tasks and related information from a specific sheet.
+     *
+     * @param {GoogleAppsScript.Document.Body} body - The body element of the Google Document.
+     * @param {Array<SheetReminder>} reminderData - Array of SheetReminder objects containing the reminder data.
+     */
     createReminderTablesInDoc(body, reminderData) {
         reminderData.forEach(sheetReminder => {
             let title = body.appendParagraph(sheetReminder.sheetName);
@@ -417,18 +442,27 @@ class ReminderManager {
             title.setBold(true).setFontSize(12);
 
             // Define headers based on period
-            let headers = this.period === 'today' ? ["項目", "概要", "日付", "担当", "完了"] : ["項目", "備考", "日付", "担当"];
+            let headers = this.period === 'today' ? ["Item", "Summary", "Date", "Staff", "Complete"] : ["Item", "Summary", "Date", "Staff"];
             this.createEachTable(body, sheetReminder.taskData, headers);
         });
     }
 
+    /**
+     * Creates a table in a Google Document for the tasks of a single sheet.
+     * Sets up headers and populates the table with task data.
+     *
+     * @param {GoogleAppsScript.Document.Body} body - The body element of the Google Document.
+     * @param {Array<Reminder>} taskData - Array of Reminder objects containing tasks for the specific sheet.
+     * @param {Array<string>} headers - Array of header titles for the table.
+     */
     createEachTable(body, taskData, headers) {
         let numRows = taskData.length + 1; // +1 for header row
         let numCols = headers.length;
         let table = body.appendTable(new Array(numRows).fill(0).map(row => new Array(numCols).fill('')));
 
             // Format the header row
-            let columnWidths = [200, 300, 100, 60, 50];  // Adjust this if needed
+            //Adjust the columnWidths with your preference
+            let columnWidths = this.period === 'today' ? [100, 200, 70, 50, 70] : [100, 250, 70, 70];
             let headerRow = table.getRow(0);
             for (let i = 0; i < headers.length; i++) {
                 headerRow.getCell(i).setText(headers[i]).setWidth(columnWidths[i]).setBold(true).setFontSize(10);
@@ -436,10 +470,11 @@ class ReminderManager {
 
             // Fill in the table content
             for (let i = 0; i < taskData.length; i++) {
-                table.getRow(i + 1).getCell(0).setText(taskData[i].item).setPaddingLeft(10).setBold(false).setFontSize(10);
-                table.getRow(i + 1).getCell(1).setText(taskData[i].note).setPaddingLeft(10).setBold(false).setFontSize(10);
-                table.getRow(i + 1).getCell(2).setText(taskData[i].date).setPaddingLeft(10).setBold(false).setFontSize(10);
-                table.getRow(i + 1).getCell(3).setText(taskData[i].staff).setPaddingLeft(10).setBold(false).setFontSize(10);
+              //Adjust the font size with your preference
+              table.getRow(i + 1).getCell(0).setText(taskData[i].item).setPaddingLeft(10).setBold(false).setFontSize(9);
+              table.getRow(i + 1).getCell(1).setText(taskData[i].note).setPaddingLeft(10).setBold(false).setFontSize(7);
+              table.getRow(i + 1).getCell(2).setText(taskData[i].date).setPaddingLeft(10).setBold(false).setFontSize(8);
+              table.getRow(i + 1).getCell(3).setText(taskData[i].staff).setPaddingLeft(10).setBold(false).setFontSize(8);
                 
                 // Only add completion status if the column exists
                 if (numCols > 4) {
@@ -448,6 +483,15 @@ class ReminderManager {
             }
     }
 
+    /**
+     * Sends an email with a reminder.
+     * Uses a template file for the HTML body and includes details about the reminder.
+     *
+     * @param {string} email - The email address to send the reminder to.
+     * @param {string} subject - The subject of the email.
+     * @param {string} successOrFailure - Indicator of whether the reminder was successfully created or not.
+     * @param {string} [displayDocUrl=""] - The URL of the Google Document containing the reminder, if applicable.
+     */
     sendEmail(email,subject,successOrFailure,displayDocUrl){
         let template = HtmlService.createTemplateFromFile('reminder-share-email');
         template.displayDocUrl = displayDocUrl;
@@ -464,43 +508,34 @@ class ReminderManager {
         });
     }
     
-  // This function should be a method inside the ReminderManager class
-  filterRemindersForStaff(reminderData, staffName) {
-    // Filter and map the reminders for the specific staff
-    return reminderData.filter(sheetReminder => {
-      // Check if the tasks array exists and has tasks assigned to the staff
-      return sheetReminder.taskData.some(task => task.staff === staffName);
-    }).map(sheetReminder => {
-      // Return a new SheetReminder with only the tasks for this staff
-      return new SheetReminder(
-        sheetReminder.sheetName,
-        sheetReminder.sheetURL,
-        sheetReminder.taskData.filter(task => task.staff === staffName)
-      );
-    });
-  }
-
     /**
-     * Deletes displayed reminders in the Google Document.
+     * Filters the reminder data for a specific staff member.
+     * Returns a modified array of SheetReminder objects containing only tasks assigned to the specified staff.
+     *
+     * @param {Array<SheetReminder>} reminderData - Array of SheetReminder objects containing the reminder data.
+     * @param {string} staffName - The name of the staff member to filter reminders for.
+     * @returns {Array<SheetReminder>} An array of SheetReminder objects with tasks for the specified staff.
      */
-    deleteRemindersInDoc(){
-      let docId;
-      let doc;
-      if(this.period === 'today' && this.target === 'general'){
-          docId = ReminderManager.extractDocIdFromUrl(TODAY_REM_DOC_URL);
-          doc = DocumentApp.openById(docId);
-          doc.getBody().clear();
-      } else if (this.period === 'today' && this.target === 'staffBased'){
-          return;
-      }
+    filterRemindersForStaff(reminderData, staffName) {
+      // Filter and map the reminders for the specific staff
+      return reminderData.filter(sheetReminder => {
+        // Check if the tasks array exists and has tasks assigned to the staff
+        return sheetReminder.taskData.some(task => task.staff === staffName);
+      }).map(sheetReminder => {
+        // Return a new SheetReminder with only the tasks for this staff
+        return new SheetReminder(
+          sheetReminder.sheetName,
+          sheetReminder.sheetURL,
+          sheetReminder.taskData.filter(task => task.staff === staffName)
+        );
+      });
     }
 
 }
 
-// Usage functions:
 /**
- * Displays the general reminder for today in the Google Doc and send an email as a reminder with the link to the Doc.
- * 
+ * Triggers the function to display today's general reminder.
+ * It collects data for today's tasks and updates the Google Doc with reminder information.
  */
 function runGeneralReminderToday() {
   let generalReminderToday = new ReminderManager('general', 'today');
@@ -508,7 +543,8 @@ function runGeneralReminderToday() {
 }
 
 /**
- * Displays the general reminder for next week in the Google Doc and send an email as a reminder with the link to the Doc.
+ * Triggers the function to display next week's general reminder.
+ * It collects data for next week's tasks and updates the Google Doc with reminder information.
  */
 function runGeneralReminderNextWeek() {
   let generalReminderNextWeek = new ReminderManager('general', 'week');
@@ -516,24 +552,19 @@ function runGeneralReminderNextWeek() {
 }
 
 /**
- * Triggers staff-based reminders for the week.
+ * Triggers the function to display today's reminder for each of designated staff.
+ * It collects data for today's tasks and updates the Google Doc with reminder information.
  */
 function runStaffReminderToday() {
     let staffReminderToday = new ReminderManager('staffBased', 'today');
     staffReminderToday.shareRemindersByDoc();
 }
+
 /**
- * Triggers staff-based reminders for the week.
+ * Triggers the function to display next week's reminder for each of designated staff.
+ * It collects data for next week's tasks and updates the Google Doc with reminder information.
  */
 function runStaffReminderNextWeek() {
     let staffReminderWeek = new ReminderManager('staffBased', 'week');
     staffReminderWeek.shareRemindersByDoc();
-}
-
-/**
- * Deletes displayed today's reminders in the Google Doc.
- */
-function deleteDisplayedRemindersInDoc(){
-  let generalReminderToday = new ReminderManager('general','today');
-  generalReminderToday.deleteRemindersInDoc();
 }

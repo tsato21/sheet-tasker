@@ -63,29 +63,37 @@
     </form>
 
     <script>
-         function submitForm() {
-            let checkedStaff = [];
-            let checkboxes = document.getElementsByName("staff");
+      /**
+       * Submits the form data to the server-side script.
+       * This function is called when the 'Submit' button is clicked.
+       * It collects the checked staff members and triggers the appropriate server-side function based on the action type.
+       */
+      function submitForm() {
+        let checkedStaff = [];
+        let checkboxes = document.getElementsByName("staff");
 
-            for (let checkbox of checkboxes) {
-                if (checkbox.checked) {
-                    checkedStaff.push(checkbox.value);
-                }
-            }
-
-            if (action === 'create') {
-                google.script.run.withSuccessHandler(closeDialog).createNewSheetWrapper(checkedStaff);
-            } else if (action === 'modify') {
-                google.script.run.withSuccessHandler(closeDialog).modifyEditorsWrapper(checkedStaff, sheetName);
-            } else {
-                google.script.run.withSuccessHandler(closeDialog).displayExecutionError(action);
+        for (let checkbox of checkboxes) {
+            if (checkbox.checked) {
+                checkedStaff.push(checkbox.value);
             }
         }
-        function closeDialog() {
-            google.script.host.close();
+        // Call the server-side function based on the action
+        if (action === 'create') {
+            google.script.run.withSuccessHandler(closeDialog).createNewSheetWrapper(checkedStaff);
+        } else if (action === 'modify') {
+            google.script.run.withSuccessHandler(closeDialog).modifyEditorsWrapper(checkedStaff, sheetName);
+        } else {
+            google.script.run.withSuccessHandler(closeDialog).displayExecutionError(action);
         }
-
+      }
+      /**
+       * Closes the dialog or web app.
+       * This function is used as a success handler in server-side function calls.
+       */
+      function closeDialog() {
+          google.script.host.close();
+      }
     </script>
-</body>
+  </body>
 
 </html>

@@ -1,43 +1,42 @@
+/**
+ * Creates a custom menu in the Google Spreadsheet UI when the spreadsheet is opened.
+ */
 function onOpen() {
   let ui = SpreadsheetApp.getUi();
     let subMenu_1 = ui.createMenu('SETTINGS')
       .addItem(`Set Pre-Defined Info`,'showSettingListsModal')
       .addSeparator()
-      .addItem(`Reset All Pre-Defined Info & Triggers`,`resetScriptPropertiesAndTriggers`)
+      .addItem(`Reset All Pre-Defined Info & Triggers`,`resetScriptPropertiesAndTriggers`)      
 
-    let subMenu_2 = ui.createMenu('INDEX SHEETS')
-      .addItem(`Update ${ONGOING_TASKS_INDEX_SHEET_NAME} and ${COMPLETED_TASKS_INDEX_SHEET_NAME}`,'updateAllTaskIndexSheets')
-
-    let subMenu_3 = ui.createMenu('TASK SHEETS')
+    let subMenu_2 = ui.createMenu('TASK SHEETS')
       .addItem('Create a New Task Sheet', 'createNewSheetModal')
       .addSeparator()
       .addItem('Modify Editors of the Current Sheet', 'modifyEditorsModal');
     
-    let subMenu_4 = ui.createMenu('OTHERS')
-      .addItem(`Conduct Authorization`,'showAuthorization')
-    
     ui.createMenu('Custom Menu')
         .addSubMenu(subMenu_1)
         .addSeparator()
+        .addItem(`Update Index Sheets`,'updateAllTaskIndexSheets')
+        .addSeparator()
         .addSubMenu(subMenu_2)
         .addSeparator()
-        .addSubMenu(subMenu_3)
-        .addSeparator()
-        .addSubMenu(subMenu_4)
+        .addItem(`Conduct Authorization`,'showAuthorization')
         .addToUi();
 }
 
-function test(){
-  let test = JSON.parse(PropertiesService.getScriptProperties().getProperty(SCRIPT_PROPERTY_KEY_GENERAL_REM_DOC_URL));
-  console.log(test);
-}
-
+/**
+ * Requests necessary authorizations for the script to access Google Services like SpreadsheetApp, DriveApp, etc.
+ */
 function showAuthorization(){
   SpreadsheetApp;
   DriveApp;
   GmailApp;
+  DocumentApp;
 }
 
+/**
+ * Displays a modal dialog with a list of settings for the user to configure.
+ */
 function showSettingListsModal() {
     // Create a template from the HTML file
     let htmlTemplate = HtmlService.createTemplateFromFile('show-setting-lists');
@@ -68,6 +67,11 @@ function showSettingListsModal() {
     SpreadsheetApp.getUi().showModalDialog(html, 'Lists of Settings');
 }
 
+/**
+ * Determines the next action based on the success or failure of the previous operation.
+ * @param {string} description - Description of the operation result.
+ * @param {string} type - Indicates whether the operation was a 'success' or 'failure'.
+ */
 function selectNextAction(description,type){
   if(type === "success"){
     let nextStep = Browser.msgBox(`${description} Do you want to proceed with another setting?`,Browser.Buttons.YES_NO);
@@ -83,10 +87,9 @@ function selectNextAction(description,type){
 
 }
 
-/*
-Setting: Staff Information of this Spreadsheet (name and email)
-This information is used when creating a new task sheet as well as designating staff for general reminders and staff-based reminders.
-*/
+/**
+ * Sets up staff information in the script's properties.
+ */
 function setStaffInfo() {
   // Fetch existing data
   let existingStaffString = PropertiesService.getScriptProperties().getProperty(SCRIPT_PROPERTY_KEY_STAFF);
@@ -126,6 +129,9 @@ function setStaffInfo() {
   confirmStaffInfoModal();
 }
 
+/**
+ * Displays a confirmation modal for staff information setup.
+ */
 function confirmStaffInfoModal() {
   let existingStaffString = PropertiesService.getScriptProperties().getProperty(SCRIPT_PROPERTY_KEY_STAFF);
   let existingStaff = JSON.parse(existingStaffString || '[]');
@@ -142,6 +148,9 @@ function confirmStaffInfoModal() {
   SpreadsheetApp.getUi().showModalDialog(html, 'Lists of Staff Information');
 }
 
+/**
+ * Displays a modal for updating existing staff information.
+ */
 function updateStaffInfoModal() {
   let existingStaffString = PropertiesService.getScriptProperties().getProperty(SCRIPT_PROPERTY_KEY_STAFF);
   let existingStaff = JSON.parse(existingStaffString || '[]');
@@ -158,6 +167,10 @@ function updateStaffInfoModal() {
   SpreadsheetApp.getUi().showModalDialog(html, 'Update Name(s) of the Staff');
 }
 
+/**
+ * Updates staff information in the script's properties and confirms the update.
+ * @param {Object[]} updatedStaffInfo - Array of objects containing updated staff information.
+ */
 function updateStaffInfo(updatedStaffInfo) {
   try {
     PropertiesService.getScriptProperties().setProperty(SCRIPT_PROPERTY_KEY_STAFF, JSON.stringify(updatedStaffInfo));
@@ -169,10 +182,9 @@ function updateStaffInfo(updatedStaffInfo) {
   }
 }
 
-/*
-Setting: Emails to Send General Reminders
-This is used to send general reminder (both today and next week).
-*/
+/**
+ * Displays a modal for setting up emails for general reminders.
+ */
 function showGeneralReminderEmailsModal() {
   try {
     let existingStaffString = PropertiesService.getScriptProperties().getProperty(SCRIPT_PROPERTY_KEY_STAFF);
@@ -201,6 +213,10 @@ function showGeneralReminderEmailsModal() {
   }
 }
 
+/**
+ * Confirms the setup of general reminder emails.
+ * @param {string[]} generalReminderEmails - Array of email addresses for general reminders.
+ */
 function confirmGeneralReminderEmails(generalReminderEmails) {
   try{
     let updatedGeneralReminderEmails = [];
@@ -223,10 +239,9 @@ function confirmGeneralReminderEmails(generalReminderEmails) {
   }
 }
 
-/*
-Setting: Designated Staff (name, email)
-This information is used when sending staff-based reminders.
-*/
+/**
+ * Displays a modal for setting up designated staff for staff-based reminders.
+ */
 function showDesignatedStaffModal() {
   try {
     let existingStaffString = PropertiesService.getScriptProperties().getProperty(SCRIPT_PROPERTY_KEY_STAFF);
@@ -242,7 +257,7 @@ function showDesignatedStaffModal() {
 
     let html = htmlTemplate
       .evaluate()
-      .setWidth(450)  // Adjusted width
+      .setWidth(600)  // Adjusted width
       .setHeight(400); // Adjusted height
 
     SpreadsheetApp.getUi().showModalDialog(html, 'Staff-based reminder email will be sent to each staff with checked.');
@@ -255,6 +270,10 @@ function showDesignatedStaffModal() {
   }
 }
 
+/**
+ * Sets up designated staff for staff-based reminders.
+ * @param {string[]} designatedStaffList - Array of designated staff information.
+ */
 function setDesignatedStaff(designatedStaffList) {
   try{
     let designatedStaff = [];
@@ -282,6 +301,9 @@ function setDesignatedStaff(designatedStaffList) {
   }
 }
 
+/**
+ * Displays a modal for setting up reminder URLs.
+ */
 function showUrlModal() {
   let htmlTemplate = HtmlService.createTemplateFromFile('show-doc-url');
   
@@ -314,7 +336,10 @@ function showUrlModal() {
   SpreadsheetApp.getUi().showModalDialog(htmlOutput, 'Set Reminder URLs');
 }
 
-// Functions to store URLs
+/**
+ * Stores URLs of Google Docs for reminders in the script's properties.
+ * @param {Object} passedData - Data containing URLs for reminders.
+ */
 function storeReminderInfo(passedData) {
   let scriptProperties = PropertiesService.getScriptProperties();
   let invalidUrls = [];
@@ -367,7 +392,14 @@ function storeReminderInfo(passedData) {
   }
 }
 
-// Updated validateGoogleDocUrl_ function to check for duplicates
+/**
+ * Validates a Google Document URL and checks for duplicates.
+ * @param {string} url - URL of the Google Document.
+ * @param {string} reminderType - Type of reminder for logging.
+ * @param {string[]} invalidUrls - Array to store invalid URLs.
+ * @param {Set} allUrlsSet - Set to store unique URLs for duplicate checking.
+ * @returns {string|null} - Validated URL or null if invalid.
+ */
 function validateGoogleDocUrl_(url, reminderType, invalidUrls, allUrlsSet) {
   if (!url || url.trim() === '') {
     // console.log(`${reminderType} is ${url} and return null.`)
@@ -393,7 +425,13 @@ function validateGoogleDocUrl_(url, reminderType, invalidUrls, allUrlsSet) {
   }
 }
 
-// Updated validateStaffReminderData function
+/**
+ * Validates the URLs in staff reminder data.
+ * @param {Object[]} staffDataArrayObject - Array of objects containing staff reminder data.
+ * @param {string[]} invalidUrls - Array to store invalid URLs.
+ * @param {Set} allUrlsSet - Set to store unique URLs for duplicate checking.
+ * @returns {Object[]} - Array of validated staff reminder data objects.
+ */
 function validateStaffReminderData(staffDataArrayObject, invalidUrls, allUrlsSet) {
   let validatedStaffArrayObject = [];
 
@@ -415,13 +453,21 @@ function validateStaffReminderData(staffDataArrayObject, invalidUrls, allUrlsSet
   return validatedStaffArrayObject;
 }
 
-// Extract document ID from a Google Docs URL
+/**
+ * Extracts the document ID from a given Google Docs URL.
+ * @param {string} url - URL of the Google Document.
+ * @returns {string|null} - Extracted document ID or null if not found.
+ */
 function extractDocIdFromUrl_(url) {
   let match = url.match(/\/d\/([a-zA-Z0-9-_]+)/);
   return match ? match[1] : null;
 }
 
-// Check if a Google Doc exists and is of the correct type
+/**
+ * Checks if a Google Document exists and is of the correct type.
+ * @param {string} fileId - ID of the Google Document file.
+ * @returns {string|boolean} - Returns 'Google Doc' if valid, 'NOT Google Doc' if invalid, or false if not accessible.
+ */
 function checkIfGoogleDocExists_(fileId) {
   try {
     let file = DriveApp.getFileById(fileId); // Attempt to access the file
@@ -438,7 +484,10 @@ function checkIfGoogleDocExists_(fileId) {
   }
 }
 
-
+/**
+ * Sets a trigger for sending reminders based on the specified function name.
+ * @param {string} functionName - Name of the function to trigger.
+ */
 function setReminderTrigger(functionName) {
   let successDescription;
   let triggerTime;
@@ -460,6 +509,11 @@ function setReminderTrigger(functionName) {
   selectNextAction(successDescription,"success");
 }
 
+/**
+ * Creates a time-based trigger for a given function.
+ * @param {string} functionName - The name of the function to be triggered.
+ * @param {Object} triggerTime - An object specifying the time settings for the trigger.
+ */
 function createTrigger(functionName, triggerTime) {
   let triggerBuilder = ScriptApp.newTrigger(functionName).timeBased();
   console.log(functionName,triggerTime);
@@ -477,7 +531,10 @@ function createTrigger(functionName, triggerTime) {
   triggerBuilder.inTimezone(Session.getScriptTimeZone()).create();
 }
 
-
+/**
+ * Deletes a specified reminder trigger.
+ * @param {string} functionName - Name of the function whose trigger is to be deleted.
+ */
 function deleteReminderTrigger(functionName) {
   let triggers = ScriptApp.getProjectTriggers();
   for (let i = 0; i < triggers.length; i++) {
@@ -492,7 +549,11 @@ function deleteReminderTrigger(functionName) {
   selectNextAction(successDescription,"success");
 }
 
-
+/**
+ * Checks if a trigger for a given function is already set.
+ * @param {string} functionName - Name of the function to check for an existing trigger.
+ * @returns {boolean} - True if a trigger is already set, false otherwise.
+ */
 function isTriggerAlreadySet_(functionName) {
   let triggers = ScriptApp.getProjectTriggers();
   for (let i = 0; i < triggers.length; i++) {
@@ -503,6 +564,11 @@ function isTriggerAlreadySet_(functionName) {
   return false;
 }
 
+/**
+ * Deletes a designated script property based on its type.
+ * @param {string} settingType - Type of setting associated with the script property.
+ * @param {string} scriptyPropertyKey - Key of the script property to be deleted.
+ */
 function deleteDesignatedScriptProperty(settingType,scriptyPropertyKey) {
     console.log(`settingType is ${settingType} and scriptyPropertyKey ${scriptyPropertyKey}`);
     scriptyPropertyKey = PROPERTY_KEYS[scriptyPropertyKey];
@@ -516,7 +582,15 @@ function deleteDesignatedScriptProperty(settingType,scriptyPropertyKey) {
     selectNextAction(successDescription,"success");
 }
 
+/**
+ * Resets all script properties and deletes all triggers associated with the script.
+ */
 function resetScriptPropertiesAndTriggers() {
+  let finalConfirmation = Browser.msgBox("Are you SURE to reset ALL Pre-Defined Information and Triggers?",Browser.Buttons.YES_NO);
+  if(finalConfirmation !== 'yes'){
+    Browser.msgBox("Reset was cancelled.");
+    return;
+  }
   // Delete all script properties
   PropertiesService.getScriptProperties().deleteAllProperties();
   

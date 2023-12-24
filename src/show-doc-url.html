@@ -73,82 +73,103 @@
   </div>
   <button onclick="saveUrls()">Save Reminder URLs</button>
 
-  <script>
-    function setGeneralUrlPlaceholders() {
-      let generalTodayInput = document.getElementById('generalTodayReminderDocUrl');
-      let generalWeekInput = document.getElementById('generalWeekReminderDocUrl');
+    <script>
+      // This script is responsible for managing the reminder URLs input form and handling interactions with server-side Google Apps Script functions.
 
-      // Set placeholders based on whether a value is already set
-      let generalTodayPlaceholder = generalTodayInput.getAttribute('data-placeholder');
-      generalTodayInput.placeholder = generalTodayInput.value || generalTodayPlaceholder;
+      /**
+       * Sets placeholder text for general reminder URL input fields based on whether a value is already set.
+       * This function is executed when the page loads.
+       */
+      function setGeneralUrlPlaceholders() {
+        let generalTodayInput = document.getElementById('generalTodayReminderDocUrl');
+        let generalWeekInput = document.getElementById('generalWeekReminderDocUrl');
 
-      let generalWeekPlaceholder = generalWeekInput.getAttribute('data-placeholder');
-      generalWeekInput.placeholder = generalWeekInput.value || generalWeekPlaceholder;
-    }
+        // Set placeholders based on whether a value is already set
+        let generalTodayPlaceholder = generalTodayInput.getAttribute('data-placeholder');
+        generalTodayInput.placeholder = generalTodayInput.value || generalTodayPlaceholder;
 
-    // Call the function to set placeholders
-    setGeneralUrlPlaceholders();
-
-    // Set the placeholder text for each input field of Staff-Based Reminder URLs
-    document.querySelectorAll('.staff-today-url').forEach(input => {
-      let staffName = input.getAttribute('data-staff-name');
-      let placeholderText = input.value ? input.value : `Input ${staffName}'s Today's Reminder URL HERE`;
-      input.setAttribute('placeholder', placeholderText);
-    });
-
-    // Set the placeholder text for each input field of Staff-Based Reminder URLs
-    document.querySelectorAll('.staff-nextweek-url').forEach(input => {
-      let staffName = input.getAttribute('data-staff-name');
-      let placeholderText = input.value ? input.value : `Input ${staffName}'s Today's Reminder URL HERE`;
-      input.setAttribute('placeholder', placeholderText);
-    });
-
-    document.querySelectorAll('.staff-nextweek-url').forEach(input => {
-      let staffName = input.getAttribute('data-staff-name');
-      let placeholderText = input.value ? input.value : `Input ${staffName}'s Next Week's Reminder URL HERE`;
-      input.setAttribute('placeholder', placeholderText);
-    });
-
-    function saveUrls() {
-      let generalTodayReminderDocUrl = document.getElementById('generalTodayReminderDocUrl').value;
-      let generalWeekReminderDocUrl = document.getElementById('generalWeekReminderDocUrl').value;
-
-      let staffTodayUrls = document.getElementsByClassName('staff-today-url');
-      let staffNextWeekUrls = document.getElementsByClassName('staff-nextweek-url');
-      let staffBasedReminderData = [];
-
-      for (let i = 0; i < staffTodayUrls.length; i++) {
-          let staffName = staffTodayUrls[i].getAttribute('data-staff-name');
-          let staffEmail = staffTodayUrls[i].getAttribute('data-staff-email');
-          let staffObject = {};
-          staffObject[staffName] = {
-              email: staffEmail,
-              todayReminderUrl: staffTodayUrls[i].value || '',
-              nextWeekReminderUrl: staffNextWeekUrls[i].value || ''
-          };
-          staffBasedReminderData.push(staffObject);
+        let generalWeekPlaceholder = generalWeekInput.getAttribute('data-placeholder');
+        generalWeekInput.placeholder = generalWeekInput.value || generalWeekPlaceholder;
       }
 
-      if(staffBasedReminderData.length === 0){
-        staffBasedReminderData = null;
-      }
+      // Executing the function to initialize the placeholders.
+      setGeneralUrlPlaceholders();
 
-      google.script.run.withSuccessHandler(closeDialog)
-                      .withFailureHandler(handleFailure)
-                      .storeReminderInfo({
-        generalTodayReminderDocUrl: generalTodayReminderDocUrl,
-        generalWeekReminderDocUrl: generalWeekReminderDocUrl,
-        staffBasedReminderData: staffBasedReminderData
+      // Set the placeholder text for each input field of Staff-Based Reminder URLs
+      document.querySelectorAll('.staff-today-url').forEach(input => {
+        let staffName = input.getAttribute('data-staff-name');
+        let placeholderText = input.value ? input.value : `Input ${staffName}'s Today's Reminder URL HERE`;
+        input.setAttribute('placeholder', placeholderText);
       });
-    }
 
-    function closeDialog() {
-      google.script.host.close();
-    }
-    function handleFailure(error) {
-      console.error("An error occurred: " + error);
-      alert("An error occurred: " + error);
-    }
-  </script>
-</body>
+      // Set the placeholder text for each input field of Staff-Based Reminder URLs
+      document.querySelectorAll('.staff-nextweek-url').forEach(input => {
+        let staffName = input.getAttribute('data-staff-name');
+        let placeholderText = input.value ? input.value : `Input ${staffName}'s Today's Reminder URL HERE`;
+        input.setAttribute('placeholder', placeholderText);
+      });
+
+      document.querySelectorAll('.staff-nextweek-url').forEach(input => {
+        let staffName = input.getAttribute('data-staff-name');
+        let placeholderText = input.value ? input.value : `Input ${staffName}'s Next Week's Reminder URL HERE`;
+        input.setAttribute('placeholder', placeholderText);
+      });
+
+      /**
+       * Saves the entered reminder URLs to server-side properties.
+       * This function is called when the 'Save Reminder URLs' button is clicked.
+       * It gathers all URL inputs, both general and staff-specific, and sends them to the server-side script.
+       */
+      function saveUrls() {
+        let generalTodayReminderDocUrl = document.getElementById('generalTodayReminderDocUrl').value;
+        let generalWeekReminderDocUrl = document.getElementById('generalWeekReminderDocUrl').value;
+
+        let staffTodayUrls = document.getElementsByClassName('staff-today-url');
+        let staffNextWeekUrls = document.getElementsByClassName('staff-nextweek-url');
+        let staffBasedReminderData = [];
+
+        for (let i = 0; i < staffTodayUrls.length; i++) {
+            let staffName = staffTodayUrls[i].getAttribute('data-staff-name');
+            let staffEmail = staffTodayUrls[i].getAttribute('data-staff-email');
+            let staffObject = {};
+            staffObject[staffName] = {
+                email: staffEmail,
+                todayReminderUrl: staffTodayUrls[i].value || '',
+                nextWeekReminderUrl: staffNextWeekUrls[i].value || ''
+            };
+            staffBasedReminderData.push(staffObject);
+        }
+
+        if(staffBasedReminderData.length === 0){
+          staffBasedReminderData = null;
+        }
+
+        google.script.run.withSuccessHandler(closeDialog)
+                        .withFailureHandler(handleFailure)
+                        .storeReminderInfo({
+          generalTodayReminderDocUrl: generalTodayReminderDocUrl,
+          generalWeekReminderDocUrl: generalWeekReminderDocUrl,
+          staffBasedReminderData: staffBasedReminderData
+        });
+      }
+      /**
+       * Closes the dialog or web app.
+       * This function is used as a success handler in server-side function calls.
+       */
+      function closeDialog() {
+        google.script.host.close();
+      }
+
+      /**
+       * Handles failures in server-side script execution.
+       * Displays an error message to the user.
+       *
+       * @param {Object} error - The error object returned from the server-side script.
+       */
+      function handleFailure(error) {
+        console.error("An error occurred: " + error);
+        alert("An error occurred: " + error);
+      }
+    </script>
+  </body>
 </html>
