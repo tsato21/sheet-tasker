@@ -2,107 +2,125 @@
 layout: default
 ---
 <body>
-  <div id="table-of-contents" class="sidebar">
-    <!-- Sidebar with Table of Contents -->
-    <ul>
-      <li><a href="#top">Top</a></li>
-      <li><a href="#prerequisites">Prerequisites</a></li>
-      <li><a href="#setup">Setup</a></li>
-      <li><a href="#others">Others</a></li>
-    </ul>
-  </div>
-
   <div class="container py-4">
-    <h1 id="top" class="mb-4">About this Project</h1>
-    <p>This project involves a Google Apps Script designed to streamline and automate various tasks within Google Sheets.</p>
-    <ul>
-      <li>Automated task management and reminders.</li>
-      <li>Seamless integration with Google Sheets functionalities.</li>
-      <li>Customizable scripts for diverse use-cases.</li>
-    </ul>
+    <aside class="mb-4">
+      <!-- Sidebar with Table of Contents -->
+      <nav class="nav flex-column">
+        <a class="nav-link" href="#top">Top</a>
+        <a class="nav-link" href="#prerequisites">Prerequisites</a>
+        <a class="nav-link" href="#setup">Setup</a>
+        <a class="nav-link" href="#usage">Usage</a>
+        <a class="nav-link" href="#others">Others</a>
+      </nav>
+    </aside>
 
-    <h2 id="prerequisites" class="mt-4">Prerequisites</h2>
-    <ul>
-      <li>A Google account with access to Google Sheets.</li>
-      <li>Basic understanding of Google Sheets and Google Apps Script.</li>
-      <li>Ability to follow step-by-step setup instructions.</li>
-    </ul>
+    <section id="top">
+      <h1>About this Project</h1>
+      <p>This project introduces a Google Apps Script designed to optimize task management and automation within Google Sheets.</p>
+      <ul>
+        <li>Automated task management and reminders for improved productivity.</li>
+        <li>Seamless integration with Google Sheets functionalities.</li>
+        <li>Customizable scripts to cater to a variety of use-cases.</li>
+      </ul>
+    </section>
 
-    <h2 id="setup" class="mt-4">Setup</h2>
-    <ol>
-      <li><strong>Open Your Google Sheet</strong>: Access <a href="https://docs.google.com/spreadsheets/d/1POCm-y8m7gonF4plOzVxxAk_1y8vjSP1xLR-4-mcMTU/edit#gid=0" target="_blank" rel="noopener noreferrer">Sample Google Sheet</a>.</li>
-      <li>Copy the Google Sheet to create your version.</li>
-      <li>
-        <strong>Conduct GAS Authorization</strong>: Go to `Custom Menu` in the menu bar and click `BEFORE FIRST USE` > `Conduct Authorization`. This will redirect you to the authorization page for Google Apps Script.
-        <div class="resize-image my-3">
-          <img src="assets/images/gas-authorization.png" alt="gas-authorization">
-        </div>
-      </li>
-      <li>
-        <strong>Return to Original Format</strong>: Go to `Custom Menu` in the menu bar and click `BEFORE FIRST USE` > `Return to Original Format`. This deletes all sample task sheets and clears the contents in the index sheets. Also, it resets information and triggers pre-defined as a sample. This makes the Google Sheet ready for your use.
-      </li>
-      <li>
-        <strong>Customize Constant Variables for Built-in Functions (Optional)</strong>: Go to the Apps Script editor and adjust the constants in `variables.gs` to suit your needs. This is optional and without customization, this project will still work.
-      </li>
-    </ol>
+    <section id="prerequisites" class="mt-4">
+      <h2>Prerequisites</h2>
+      <ul>
+        <li>Access to Google Sheets with a Google account.</li>
+        <li>Familiarity with Google Sheets and basic Google Apps Script usage.</li>
+        <li>Willingness to engage with detailed setup instructions.</li>
+      </ul>
+    </section>
 
-    <h2 id="usage" class="mt-4">Usage</h2>
-    <ol class="list-group">
-      <li class="list-group-item">
-        <div style="display: flex; align-items: center;">
-          <div>
-            Access <strong>`Custom Menu` > `SETTINGS` > `Set Pre-Defined Info`</strong> to configure necessary information. 
-            <ul>
-              <li>【General Setting】: Mandatory to configure staff information.</li>
-              <li>【General Reminder Settings】: Set emails for general reminders, the Google Doc URL for displaying reminders, and triggers for reminders. Prior creation of a Google Doc for reminders is required.</li>
-              <li>【Staff-Based Reminder Settings】: Optional, for individual staff reminders. Prior creation of a Google Doc for each staff is required.</li>
-              <li>【Others】: Set triggers for updating task completion status.</li>
-            </ul>
-            <p>*If the user would like to reset all pre-defined information and delete triggers, Access <strong>`Custom Menu` > `SETTINGS` > `Reset All Pre-Defined Info & Triggers`</strong>.</p>
-            <p>*Once the information is set, the button becomes either "update", "reset", or "delete", depending on type of the pre-set information.</p>
+    <section id="setup" class="mt-4">
+      <h2>Setup</h2>
+      <ol>
+        <li><strong>Open Your Google Sheet</strong>: Begin with the <a href="https://docs.google.com/spreadsheets/d/1POCm-y8m7gonF4plOzVxxAk_1y8vjSP1xLR-4-mcMTU/edit#gid=0" target="_blank">Sample Google Sheet</a>.</li>
+        <li>Copy the sheet to create your personalized version.</li>
+        <li><strong>Conduct GAS Authorization</strong>: From the `Custom Menu`, select `BEFORE FIRST USE` > `Conduct Authorization` for Google Apps Script authorization.</li>
+        <li><strong>Return to Original Format</strong>: To prepare your sheet for use, navigate to `Custom Menu` > `BEFORE FIRST USE` > `Return to Original Format`.</li>
+        <li><strong>Customize Constant Variables (Optional)</strong>: Adjust the constants in `variables.gs` in the Apps Script editor to suit your needs.</li>
+      </ol>
+    </section>
+
+    <section id="usage" class="mt-4">
+      <h2>Usage</h2>
+      <p>Here's how you can make the most out of this project:</p>
+      <ol class="list-group">
+        <li class="list-group-item">
+          <strong>Set Pre-Defined Information</strong>: Configure necessary settings through <strong>`Custom Menu` > `SETTINGS` > `Set Pre-Defined Info`</strong>.
+          <ul>
+            <li>【General Setting】: Mandatory for configuring staff information.</li>
+            <li>【General Reminder Settings】: Essential for setting up email reminders and Google Doc URLs for displaying reminders.</li>
+            <li>【Staff-Based Reminder Settings】: Optional, for individual staff reminders.</li>
+            <li>【Others】: Configure triggers for task completion status updates.</li>
+          </ul>
+          <p>*Reset or update pre-defined information as needed.</p>
+          <div class="row">
+            <div class="col-md-6">
+              <img src="assets/images/setup-image-1.png" alt="Setup Image 1" class="img-fluid">
+            </div>
+            <div class="col-md-6">
+              <img src="assets/images/setup-image-2.png" alt="Setup Image 2" class="img-fluid">
+            </div>
           </div>
+        </li>
+        
+        <li class="list-group-item">
+          Create task sheets and enter to-do items.
+          <ul>
+            <li>Create new task sheets via <strong>`Custom Menu` > `TASK SHEETS` > `Create a New Task Sheet`</strong>. This enables the sheet to be created with designated format.</li>
+            <li>Assign tasks to specific staff members using the dropdown in the task sheet.</li>
+            <p>If you need to modify editors of the sheet, access `Custom Menu` > `TASK SHEETS` > `Modify Editors of the Current Sheet`.</p>
+          </ul>
           <div class="resize-image my-3">
-            <img src="assets/images/setup-image-1.png" alt="Setup Image 1" class="img-fluid mt-2">
-            <img src="assets/images/setup-image-2.png" alt="Setup Image 2" class="img-fluid mt-2">
-        </div>
-        </div>
-      </li>
-      <li class="list-group-item">
-        Create task sheets and enter to-do items.
-        <ul>
-          <li>Create new task sheets via <strong>`Custom Menu` > `TASK SHEETS` > `Create a New Task Sheet`</strong>. This enables the sheet to be created with designated format (row and column design, data validation, and making only designated users editable).</li>
-          <li>Assign tasks to specific staff members using the dropdown in the task sheet.</li>
-          <p>If the user wants to modify editors of the sheet (staff in charge of the task sheet), they can modify it by `Custom Menu` > `TASK SHEETS` > `Modify Editors of the Current Sheet`.</p>
-          <li>Optionally, test reminder functionalities via <strong>Custom Menu > REMINDER</strong>. Befor the use of this feature, please set up necessary information in 'SETTING'.</li>
-        </ul>
-        <div class="resize-image my-3"></div>
-          <img src="assets/images/task-sheet-creation.png" alt="Task Sheet Creation Image">
-        </div>
-      </li>
-  
-      <li class="list-group-item">
-        Update completion status for tasks.
-        <p>Input "C" in the complete cell for completed tasks in the reminder Google Docs to reflect the changes automatically in the Google Spreadsheet.</p>
-        <div class="resize-image my-3"></div>
-          <img src="assets/images/update-complete.png" alt="update-complete">
-        </div>
-      </li>
-  
-      <li class="list-group-item">
-        Update Index Sheets and Sort Task Sheets.
-        <strong>`Custom Menu` > `Update Index Sheets and Sort Task Sheets`</strong> to update index sheets (ongoing-task-index/ completed-task-index) and sort all of the task sheets by the date ascending.</p>
-        <p>*Once all of the tasks listed in a specific sheet are completed, rename the task sheet with "Fin)". These sheets will be automatically listed in `completed-task-index`. </p>
-      </li>
-      <div class="resize-image my-3"></div>
-        <img src="assets/images/update-index.png" alt="update-index">
-      </div>
-      
-    </ol>
+            <img src="assets/images/task-sheet-creation.png" alt="Task Sheet Creation Image" class="img-fluid">
+          </div>
+        </li>
 
-    <h2 id="others" class="mt-4">Others</h2>
-    <ul>
-      <li><strong>Additional Functionality</strong>: Explore other features like report generation, data analysis, etc.</li>
-      <li><strong>Customization</strong>: Tailor the scripts to fit your specific workflow and requirements.</li>
-    </ul>
+        <li class="list-group-item">
+          Test reminders.
+          <ul>
+            <li>Access <strong>`Custom Menu` > `REMINDERS` > `General Reminders`</strong> to test general reminders.</li>
+            <li>Access <strong>`Custom Menu` > `REMINDERS` > `Staff-Based Reminders`</strong> to test staff-based reminders.</li>
+            <p>*Before using this feature, create Google Docs to display each type of reminders.</p>
+          </ul>
+          <div class="resize-image my-3">
+            <img src="assets/images/reminder-email.png" alt="Reminder Email" class="img-fluid">
+            <img src="assets/images/reminder-general-doc-today.png" alt="General Reminder Doc Today" class="img-fluid">
+            <img src="assets/images/reminder-general-doc-week.png" alt="General Reminder Doc Week" class="img-fluid">
+            <img src="assets/images/reminder-staff-based-doc.png" alt="Staff-Based Reminder Doc" class="img-fluid">
+          </div>
+        </li>
+
+        <li class="list-group-item">
+          Update completion status for tasks.
+          <p>Input "C" in the complete cell for completed tasks in the reminder Google Docs to reflect the changes automatically in the Google Spreadsheet.</p>
+          <div class="resize-image my-3">
+            <img src="assets/images/update-complete.png" alt="Update Complete" class="img-fluid">
+          </div>
+        </li>
+
+        <li class="list-group-item">
+          Update Index Sheets and Sort Task Sheets.
+          <p>Use <strong>`Custom Menu` > `Update Index Sheets and Sort Task Sheets`</strong> to update index sheets and sort all of the task sheets by the date ascending.</p>
+          <p>*Once all tasks in a sheet are completed, rename the sheet with "Fin)" to list it in `completed-task-index`.</p>
+          <div class="resize-image my-3">
+            <img src="assets/images/update-index-sort-taskSh.png" alt="Update Index and Sort Task Sheets" class="img-fluid">
+          </div>
+        </li>
+      </ol>
+    </section>
+
+    <section id="others" class="mt-4">
+      <h2>Others</h2>
+      <ul>
+        <li>Explore additional features such as report generation and data analysis.</li>
+        <li>Customize the scripts to align with your specific workflow and requirements.</li>
+      </ul>
+    </section>
   </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>

@@ -1,6 +1,7 @@
 body {
   font-family: Arial, sans-serif;
   margin: 0; /* Reset default margin */
+  width: 100%;
 }
 
 a {
