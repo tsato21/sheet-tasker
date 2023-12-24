@@ -12,6 +12,20 @@ function onOpen() {
       .addItem('Create a New Task Sheet', 'createNewSheetModal')
       .addSeparator()
       .addItem('Modify Editors of the Current Sheet', 'modifyEditorsModal');
+
+    let subMenu_3 = ui.createMenu('REMINDER')
+      .addItem(`Send General Today's Reminder`,'runGeneralReminderToday')
+      .addSeparator()
+      .addItem(`Send General Next Week's Reminder`, 'runGeneralReminderNextWeek')
+      .addSeparator()
+      .addItem(`Send Staff-Based Today's Reminder`,'runStaffReminderToday')
+      .addSeparator()
+      .addItem(`Send Staff-Based Next Week's Reminder`,'runStaffReminderNextWeek')
+
+    let subMenu_4 = ui.createMenu('BEFORE FIRST USE')
+      .addItem(`Conduct Authorization`,'showAuthorization')
+      .addSeparator()
+      .addItem('Return to Original Format', 'returnToOriginalFormat');
     
     ui.createMenu('Custom Menu')
         .addSubMenu(subMenu_1)
@@ -20,7 +34,9 @@ function onOpen() {
         .addSeparator()
         .addSubMenu(subMenu_2)
         .addSeparator()
-        .addItem(`Conduct Authorization`,'showAuthorization')
+        .addSubMenu(subMenu_3)
+        .addSeparator()
+        .addSubMenu(subMenu_4)
         .addToUi();
 }
 
@@ -32,6 +48,37 @@ function showAuthorization(){
   DriveApp;
   GmailApp;
   DocumentApp;
+}
+
+/**
+ * Resets the Google Spreadsheet to its original format.
+ * This function clears the content of Ongoing and Completed Tasks Index Sheets,
+ * deletes all other sheets, and resets the script properties and triggers.
+ * 
+ * It iterates through all sheets in the active spreadsheet. If a sheet matches
+ * the predefined Ongoing or Completed Tasks Index Sheet names, it clears the content
+ * of that sheet. Otherwise, it deletes the sheet. After processing all sheets,
+ * it resets the script properties and triggers.
+ *
+ * A message box is displayed upon completion of the process.
+ */
+function returnToOriginalFormat() {
+  let spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+  let allSheets = spreadsheet.getSheets();
+  
+  for (let sheet of allSheets) {
+    let sheetName = sheet.getName();
+    if (sheetName === ONGOING_TASKS_INDEX_SHEET_NAME || sheetName === COMPLETED_TASKS_INDEX_SHEET_NAME) {
+      sheet.clear();
+      continue; // Skip the current iteration and continue with the next sheet
+    }
+    spreadsheet.deleteSheet(sheet); // Correct method to delete the sheet
+  }
+
+  resetScriptPropertiesAndTriggers();
+
+  // Display a message box after completion
+  Browser.msgBox("Return to the original format (All sheets except Index Sheets deleted/Contents in index sheets cleared/ Pre-defined information reset/ Pre-set triggers deleted).");
 }
 
 /**

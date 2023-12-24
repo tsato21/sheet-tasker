@@ -40,6 +40,9 @@ class ReminderManager {
         this.scriptProperties = PropertiesService.getScriptProperties();
     }
 
+    /*
+    Use either Japanese version or English version to display date in Reminder Docs and Gmail Subject
+    */
     /**
      * Formats a given Date object into a Japanese date string.
      *
@@ -60,6 +63,29 @@ class ReminderManager {
       
         return `${month}${date}日(${day})`;
     }
+
+    /**
+     * Formats a given Date object into an English date string.
+     *
+     * @param {Date} dateObj - The Date object to format.
+     * @returns {string} - The formatted date string in English format.
+     *
+     * @example
+     * let date = new Date(2023, 4, 5); // 5th May 2023
+     * console.log(ReminderManager.formatEnglishDate(date)); // Outputs: "Friday, May 5, 2023"
+     */
+    static formatEnglishDate(dateObj) {
+        let months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+        let days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+
+        let month = months[dateObj.getMonth()];
+        let day = days[dateObj.getDay()];
+        let date = dateObj.getDate();
+        let year = dateObj.getFullYear();
+
+        return `${day}, ${month} ${date}, ${year}`;
+    }
+
 
     /**
      * Extracts the Google Document ID from a given URL.
@@ -211,7 +237,7 @@ class ReminderManager {
                   // console.log(`Date is not input for this event, which is not subject to the reminder.`);
                   continue;
               }
-              let dateInfo = ReminderManager.formatJapaneseDate(dateStr);
+              let dateInfo = ReminderManager.formatEnglishDate(dateStr);
               let item = data[i][1];
               let note = data[i][2];
               
@@ -300,7 +326,7 @@ class ReminderManager {
                   let generalWeekReminderDocUrl = generalReminderDocsUrls.generalWeekReminderDocUrl;
 
                     if(this.period === 'today'){
-                      title = `Today's General Reminder on ${ReminderManager.formatJapaneseDate(new Date())}`;
+                      title = `Today's General Reminder on ${ReminderManager.formatEnglishDate(new Date())}`;
                       if(generalTodayReminderDocUrl !== null){
                         docId = ReminderManager.extractDocIdFromUrl(generalTodayReminderDocUrl);
                         body = this.presetInDoc(docId, title);
@@ -317,7 +343,7 @@ class ReminderManager {
                         return;
                       }
                     } else if(this.period === 'week') {
-                      title = `Next Week's General Reminder on ${ReminderManager.formatJapaneseDate(new Date())}`;
+                      title = `Next Week's General Reminder on ${ReminderManager.formatEnglishDate(new Date())}`;
                       if(generalWeekReminderDocUrl !== null){
                         docId = ReminderManager.extractDocIdFromUrl(generalWeekReminderDocUrl);
                         body = this.presetInDoc(docId, title);
@@ -353,7 +379,7 @@ class ReminderManager {
                     let staffSpecificReminders;
 
                     if(this.period === 'today'){
-                      title = `Today's Reminder for ${staffName} on ${ReminderManager.formatJapaneseDate(new Date())}`;
+                      title = `Today's Reminder for ${staffName} on ${ReminderManager.formatEnglishDate(new Date())}`;
                       if(staffInfo.todayReminderUrl){
                         docId = ReminderManager.extractDocIdFromUrl(staffInfo.todayReminderUrl);
                         body = this.presetInDoc(docId, title);
@@ -371,7 +397,7 @@ class ReminderManager {
                         return;
                       }
                     } else if (this.period === 'week'){
-                      title = `Next Week's Reminder for ${staffName} on ${ReminderManager.formatJapaneseDate(new Date())}`;
+                      title = `Next Week's Reminder for ${staffName} on ${ReminderManager.formatEnglishDate(new Date())}`;
                       if(staffInfo.nextWeekReminderUrl){
                         docId = ReminderManager.extractDocIdFromUrl(staffInfo.nextWeekReminderUrl);
                         body = this.presetInDoc(docId, title);

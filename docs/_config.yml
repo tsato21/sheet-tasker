@@ -1,4 +1,4 @@
 # Site settings
 theme: jekyll-theme-primer
-title: 'Template'
-description: 'XXXXXX'
+title: 'Task & Reminder Management'
+description: 'This project involves a Google Apps Script designed to streamline and automate various tasks within Google Sheets.'
