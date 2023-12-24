@@ -39,9 +39,9 @@ layout: default
         </div>
       </li>
       <li>
-        <strong>Return to Original Format.</strong>: Go to `Custom Menu` in the menu bar and click `BEFORE FIRST USE` > `Return to Original Format`. This deletes all sample task sheets and clears the contents in the index sheets. Also, it resets information and triggers pre-defined as a sample. This makes the Google Sheet ready for your use.
+        <strong>Return to Original Format</strong>: Go to `Custom Menu` in the menu bar and click `BEFORE FIRST USE` > `Return to Original Format`. This deletes all sample task sheets and clears the contents in the index sheets. Also, it resets information and triggers pre-defined as a sample. This makes the Google Sheet ready for your use.
         <div class="resize-image my-3">
-          <img src="assets/images/delete-clear-sample.png" alt="delete-clear-sample">
+          <img src="assets/images/return-original.png" alt="return-original">
         </div>
       </li>
       <li>
@@ -50,48 +50,47 @@ layout: default
     </ol>
 
     <h2 id="usage" class="mt-4">Usage</h2>
-    <ol class="list-group list-group-numbered">
-      <li class="list-group-item"><strong>Task Management</strong>: Leverage the script to efficiently manage and track tasks within your Google Sheet.</li>
-      <li class="list-group-item"><strong>Automated Reminders</strong>: Configure automated reminders to efficiently manage task deadlines and events.</li>
+    <ol class="list-group">
+      <li class="list-group-item">
+        <div style="display: flex; align-items: center;">
+          <div>
+            Access <strong>`Custom Menu` > `SETTINGS` > `Set Pre-Defined Info`</strong> to configure necessary information. 
+            <ul>
+              <li>【General Setting】: Mandatory to configure staff information.</li>
+              <li>【General Reminder Settings】: Set emails for general reminders, the Google Doc URL for displaying reminders, and triggers for reminders. Prior creation of a Google Doc for reminders is required.</li>
+              <li>【Staff-Based Reminder Settings】: Optional, for individual staff reminders. Prior creation of a Google Doc for each staff is required.</li>
+              <li>【Others】: Set triggers for updating task completion status.</li>
+            </ul>
+            <p>*If the user would like to reset all pre-defined information and delete triggers, Access <strong>`Custom Menu` > `SETTINGS` > `Reset All Pre-Defined Info & Triggers`</strong>.</p>
+            <p>*Once the information is set, the button becomes either "update", "reset", or "delete", depending on type of the pre-set information.</p>
+          </div>
+          <img src="path/to/setup-image-1.png" alt="Setup Image 1" class="img-fluid mt-2">
+          <img src="path/to/setup-image-2.png" alt="Setup Image 2" class="img-fluid mt-2">
+        </div>
+      </li>
+      <li class="list-group-item">
+        Create task sheets and enter to-do items.
+        <ul>
+          <li>Create new task sheets via <strong>`Custom Menu` > `TASK SHEETS` > `Create a New Task Sheet`</strong>.</li>
+          <li>Assign tasks to specific staff members using the dropdown in the task sheet.</li>
+          <li>Optionally, test reminder functionalities via <strong>Custom Menu > REMINDER</strong>.</li>
+        </ul>
+        <img src="path/to/task-sheet-creation.png" alt="Task Sheet Creation Image" class="img-fluid mt-2">
+      </li>
+  
+      <li class="list-group-item">
+        Update completion status for tasks.
+        <p>Input "C" in the complete cell for completed tasks in the reminder Google Docs to reflect the changes automatically in the Google Spreadsheet.</p>
+      </li>
+  
+      <li class="list-group-item">
+        Update Index Sheets and Sort Task Sheets.
+        <strong>`Custom Menu` > `Update Index Sheets and Sort Task Sheets`</strong> to update index sheets and sort all of the task sheets by the date ascending.</p>
+        <p>*Once all of the tasks listed in a specific sheet are completed, rename the task sheet with "Fin)" and update index sheets via 
+      </li>
+      <img src="path/to/update-index-sort-taskSh.png" alt="update-index-sort-taskSh" class="img-fluid mt-2"> 
+      
     </ol>
-    
-    <div class="container mt-4">
-      <h3>Setting Up the Project</h3>
-      <p>Follow these steps to set up and start using the project:</p>
-    
-      <ol class="list-group">
-        <li class="list-group-item">
-          Access <strong>SETTINGS > Set Pre-Defined Info</strong> from the custom menu to configure necessary information. 
-          <ul>
-            <li>【General Setting】: Mandatory to configure staff information.</li>
-            <li>【General Reminder Settings】: Set emails for general reminders, the Google Doc URL for displaying reminders, and triggers for reminders.</li>
-            <li>【Staff-Based Reminder Settings】: Optional, for individual staff reminders. Prior setup of a Google Doc for each staff is required.</li>
-            <li>【Others】: Set triggers for updating task completion status.</li>
-          </ul>
-          <img src="path/to/setup-image.png" alt="Setup Image" class="img-fluid mt-2"> <!-- Suggested location for a screenshot -->
-        </li>
-    
-        <li class="list-group-item">
-          Create task sheets and enter to-do items.
-          <ul>
-            <li>Create new task sheets via <strong>Custom Menu > TASK SHEETS > Create a New Task Sheet</strong>.</li>
-            <li>Assign tasks to specific staff members using the dropdown in the task sheet.</li>
-            <li>Optionally, test reminder functionalities via <strong>Custom Menu > REMINDER</strong>.</li>
-          </ul>
-          <img src="path/to/task-sheet-creation.png" alt="Task Sheet Creation Image" class="img-fluid mt-2"> <!-- Suggested location for a screenshot -->
-        </li>
-    
-        <li class="list-group-item">
-          Update completion status for tasks.
-          <p>Mark tasks as complete in the reminder Google Docs to reflect the changes automatically in the Google Spreadsheet.</p>
-        </li>
-    
-        <li class="list-group-item">
-          Manage Task Sheets and Index Sheets.
-          <p>Once tasks are completed, rename the task sheet with "Fin)" and update index sheets via <strong>Custom Menu > Update Index Sheets</strong>.</p>
-        </li>
-      </ol>
-    </div>
 
     <h2 id="others" class="mt-4">Others</h2>
     <ul>
