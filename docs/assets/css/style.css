@@ -57,3 +57,30 @@ footer {
 }
 
 /* Add additional styles as needed */
+body {
+  background-color: #f4f4f4;
+}
+.resize-image img {
+  max-width: 100%;
+  height: auto;
+}
+.sidebar {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  padding: 20px;
+}
+.content {
+  margin-left: 250px;
+  padding: 20px;
+}
+.list-group-item {
+  background-color: #f8f9fa;
+}
+.container-img {
+  text-align: center;
+}
+.image-caption {
+  margin-top: 5px;
+}
