@@ -1,86 +1,74 @@
 body {
+  background-color: #f4f4f4;
   font-family: Arial, sans-serif;
-  margin: 0; /* Reset default margin */
-  width: 100%;
 }
 
 a {
-  color: blue; /* This will make all links blue */
+  color: blue;
   text-decoration: none;
 }
 
-.resize-image {
-  width: 350px;
-  height: 200px;
+.resize-image img {
+  max-width: 100%;
+  height: auto;
 }
 
-#table-of-contents {
-  overflow-y: scroll;
+.sidebar {
+  overflow-y: auto;
   position: fixed;
-  left: 0;
   top: 0;
   bottom: 0;
-  width: 250px; /* Width of the ToC */
-  background-color: #f8f9fa; /* Background color for ToC */
-  padding: 1em;
-  box-sizing: border-box; /* Include padding in the width calculation */
+  left: 0;
+  width: 250px;
+  background-color: #f8f9fa;
+  padding: 1rem;
+  box-sizing: border-box;
 }
 
-#main-content {
-  margin-left: 250px; /* Margin to accommodate the width of the ToC */
-  padding: 20px; /* Padding for the main content */
+.content {
+  margin-left: 260px;
+  padding: 1rem;
 }
 
-/* Style the header to match the main content area */
-header {
-  padding-left: 250px; /* This should match the ToC width if you want it aligned with the main content */
+.list-group-item {
+  background-color: #f8f9fa;
 }
 
-/* Adjust the footer to match the main content area as well */
-footer {
-  padding-left: 250px; /* This should match the ToC width */
+.container-img, .image-caption {
+  text-align: center;
+  margin-top: 0.5rem;
 }
 
-/* Optional: Style the list within the ToC for better appearance */
+.nav-link.active {
+  font-weight: bold;
+}
+
+.nav-pills .nav-link {
+  border-radius: 0;
+}
+
+.section-header {
+  padding-top: 1rem;
+}
+
+.header {
+  padding-left: 250px;
+}
+
+.footer {
+  padding-left: 250px;
+}
+
 #table-of-contents ul {
-  list-style-type: none; /* Removes default list styling */
+  list-style-type: none;
   padding: 0;
   margin: 0;
 }
 
 #table-of-contents li {
-  padding: 0.4em 0; /* Add some padding to each list item for spacing */
+  padding: 0.4em 0;
 }
 
 #table-of-contents a:hover {
-  color: #00008B; /* Change the color to red on hover, or choose your own color */
-}
-
-/* Add additional styles as needed */
-body {
-  background-color: #f4f4f4;
-}
-.resize-image img {
-  max-width: 100%;
-  height: auto;
-}
-.sidebar {
-  position: fixed;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  padding: 20px;
-}
-.content {
-  margin-left: 250px;
-  padding: 20px;
-}
-.list-group-item {
-  background-color: #f8f9fa;
-}
-.container-img {
-  text-align: center;
-}
-.image-caption {
-  margin-top: 5px;
+  color: #00008B;
 }
