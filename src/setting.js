@@ -30,7 +30,7 @@ function onOpen() {
     ui.createMenu('Custom Menu')
         .addSubMenu(subMenu_1)
         .addSeparator()
-        .addItem(`Update Index Sheets`,'updateAllTaskIndexSheets')
+        .addItem(`Update Index Sheets and Sort Task Sheets`,'updateAllTaskIndexSheets')
         .addSeparator()
         .addSubMenu(subMenu_2)
         .addSeparator()

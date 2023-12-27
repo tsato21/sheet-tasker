@@ -34,14 +34,19 @@
     #staffBasedUrlsContainer {
       margin-bottom: 20px;
     }
+    label {
+      display: block;
+    }
   </style>
 </head>
 <body>
   <h2>General Reminder URLs</h2>
+  <label for="general-today-url">For Today's URL</label>
   <input type="text" id="generalTodayReminderDocUrl" 
         data-placeholder="Input General Today's Reminder URL HERE"
         value="<?= generalTodayReminderDocUrl ?>"
         placeholder="">
+  <label for="general-nextweek-url">For Next Week's URL</label>
   <input type="text" id="generalWeekReminderDocUrl" 
         data-placeholder="Input General Next Week's Reminder URL HERE"
         value="<?= generalWeekReminderDocUrl ?>"
@@ -52,13 +57,15 @@
     <? if (staffBasedReminderData.length > 0) { ?>
       <? for (let i = 0; i < staffBasedReminderData.length; i++) { ?>
         <div>
-          <div><strong><?= staffBasedReminderData[i].name ?></strong></div>
+          <div style="font-size: 20px; margin-bottom: 3px"><strong><?= staffBasedReminderData[i].name ?></strong></div>
+          <label for="staff-today-url-<?= i ?>">For Today's URL</label>
           <input type="text" 
                 class="staff-today-url" 
                 data-staff-name="<?= staffBasedReminderData[i].name ?>" 
                 data-staff-email="<?= staffBasedReminderData[i].email ?>" 
                 value="<?= staffBasedReminderData[i].todayUrl ?>"
                 placeholder="">
+          <label for="staff-nextweek-url-<?= i ?>">For Next Week's URL</label>
           <input type="text" 
                 class="staff-nextweek-url" 
                 data-staff-name="<?= staffBasedReminderData[i].name ?>"
