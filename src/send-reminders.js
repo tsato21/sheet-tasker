@@ -152,50 +152,48 @@ class ReminderManager {
         console.log('Starting getReminderData...');
         let startTime = new Date().getTime();
         let sheets = this.ss.getSheets();
-        // Fetch the STORED_REMINDERS property
-        let storedDataStr = this.scriptProperties.getProperty(SCRIPT_PROPERRY_KEY_STORED_REMINDERS);
+
+        // Use unique keys for stored reminders and current sheet index
+        let storedDataKey = `SCRIPT_PROPERTY_KEY_STORED_REMINDERS_${this.target.toUpperCase()}_${this.period.toUpperCase()}`;
+        let currentSheetIndexKey = `SCRIPT_PROPERTY_KEY_CURRENT_SHEET_INDEX_${this.target.toUpperCase()}_${this.period.toUpperCase()}`;
+        let storedDataStr = this.scriptProperties.getProperty(storedDataKey);
+        let completionStatusKey = this.getCompletionStatusKey();
+        this.scriptProperties.setProperty(completionStatusKey,'NOT YET');
+
 
         if (storedDataStr) {
-          // If the property exists, attempt to parse it as JSON
-          try {
-            this.reminderData = JSON.parse(storedDataStr);
-            console.log(`There are some reminderData already stored in the previous execution.`);
-          } catch (e) {
-            console.error('Error parsing STORED_REMINDERS. Defaulting to an empty array.', e);
-          }
+            try {
+                this.reminderData = JSON.parse(storedDataStr);
+                console.log(`There are some reminderData already stored in the previous execution.`);
+            } catch (e) {
+                console.error('Error parsing stored reminders. Defaulting to an empty array.', e);
+            }
         }
-        let currentSheetIndex = parseInt(this.scriptProperties.getProperty(SCRIPT_PROPERTY_KEY_CURRENT_SHEET_INDEX) || '0');
+
+        let currentSheetIndex = parseInt(this.scriptProperties.getProperty(currentSheetIndexKey) || '0');
         let today = new Date();
         today.setHours(0, 0, 0, 0);
 
         for (let i = currentSheetIndex; i < sheets.length; i++) {
           let sheet = sheets[i];
           let sheetName = sheet.getName();
+          console.log(`Start reading ${sheetName}`);
 
           // Simulate a long-running process for testing purposes by sleeping for 10 seconds
           // Utilities.sleep(10000);
-          
-          // Check elapsed time, if more than 5 minutes (290 seconds for a buffer), save progress and exit
-          // On timeout, trigger sendGeneralReminder
-          if ((new Date().getTime() - startTime) > 290 * 1000) {
-            this.scriptProperties.setProperty(SCRIPT_PROPERTY_KEY_CURRENT_SHEET_INDEX, i.toString());
-            this.scriptProperties.setProperty(SCRIPT_PROPERRY_KEY_STORED_REMINDERS,JSON.stringify(this.reminderData));
-            console.log(`Timeout detected in getReminders, and the top level function using this method will be executed in 30 seconds`);
-            this.scriptProperties.setProperty(SCRIPT_PROPERRY_KEY_COMPLETION_STATUS,'NOT YET');
 
-            if(this.period === 'today' && this.target === 'general'){
-              ScriptApp.newTrigger('runGeneralReminderToday').timeBased().after(30000).create();
-              return;
-            } else if(this.period === 'week' && this.target === 'general'){
-              ScriptApp.newTrigger('runGeneralReminderNextWeek').timeBased().after(30000).create();
-              return;
-            } else if(this.period === 'today' && this.target === 'staffBased'){
-              ScriptApp.newTrigger('runStaffReminderToday').timeBased().after(30000).create();
-              return;
-            } else if(this.period === 'week' && this.target === 'staffBased'){
-              ScriptApp.newTrigger('runStaffReminderNextWeek').timeBased().after(30000).create();
-              return;
-            }
+          // Check elapsed time, if more than 5 minutes (3000 seconds for a buffer), save progress and exit
+          // On timeout, trigger sendGeneralReminder
+          // if ((new Date().getTime() - startTime) > 300000) {
+          if ((new Date().getTime() - startTime) > 700) {
+           // Save progress with the unique key
+            this.scriptProperties.setProperty(storedDataKey, JSON.stringify(this.reminderData));
+            this.scriptProperties.setProperty(currentSheetIndexKey, i.toString());
+            this.createOneTimeTrigger();
+
+            console.log(`Timeout detected, saving progress and setting a trigger for continuation.`);
+
+            return;
             
           } else {
             console.log(`Execusion continues when reading the data in ${sheetName}`);
@@ -266,12 +264,15 @@ class ReminderManager {
               this.reminderData.push(new SheetReminder(sheet.getName(), sheetURL, taskData));
             }
           }
-        }
-        console.log('Completed processing all sheets in getReminderData and ready to send a reminder.');
-        this.scriptProperties.deleteProperty('CURRENT_SHEET_INDEX');
-        this.scriptProperties.deleteProperty('STORED_REMINDERS');
-        this.scriptProperties.setProperty(SCRIPT_PROPERRY_KEY_COMPLETION_STATUS,'COMPLETED');
+        }        
+        // Clear the stored reminders and current sheet index after successful processing
+        this.scriptProperties.deleteProperty(storedDataKey);
+        this.scriptProperties.deleteProperty(currentSheetIndexKey);
+        this.deleteOneTimeTriggers();
+        this.scriptProperties.setProperty(completionStatusKey,'COMPLETED');
 
+
+        console.log('Completed processing all sheets in getReminderData.');
         return this.reminderData;
     }
 
@@ -282,17 +283,19 @@ class ReminderManager {
     shareRemindersByDoc() {
         try {
           let reminderData = this.getReminderData();
-          let completionStatus = this.scriptProperties.getProperty(SCRIPT_PROPERRY_KEY_COMPLETION_STATUS);
+          let completionStatusKey = this.getCompletionStatusKey();
+          // Fetch the completion status using the constructed key
+          let completionStatus = this.scriptProperties.getProperty(completionStatusKey);
 
           if (completionStatus === 'NOT YET') {
-              console.log(`It is still in the middle of getting reminder data by getReminders`);
+              console.log(`getReminderData is still in the middle of processing. Thus, shareRemindersByDoc is not continued.`);
               return;
           } else if (completionStatus === 'COMPLETED') {
-              if (reminderData.length === 0) {
-                  console.log(`There is no reminder data to display.`);
+              if (!Array.isArray(reminderData) || reminderData.length === 0) {
+                  console.log(`There is no reminder data to display or reminderData is not an array.`);
                   return;
               }
-              console.log('Start creating reminder doc.');
+              console.log('shareRemindersByDoc has started being executed to creating a reminder doc.');
               let docId, title, body, displayDocUrl, successOrFailure;
 
               let generalReminderEmails = JSON.parse(this.scriptProperties.getProperty(SCRIPT_PROPERTY_KEY_GENERAL_REMINDER_EMAILS));
@@ -335,12 +338,12 @@ class ReminderManager {
                         successOrFailure = "success";
                         this.sendEmail(generalReminderEmails,title,successOrFailure,displayDocUrl);
                         console.log(`Today's general reminders were successfully shared by email.`);
-                        return;
+                        return true;
                       } else {
                         successOrFailure = "failure";
                         this.sendEmail(generalReminderEmails,title,successOrFailure);
                         console.log(`Today's general reminders could not be shared since the Google Doc is not set, which was informed by email.`);
-                        return;
+                        return true;
                       }
                     } else if(this.period === 'week') {
                       title = `Next Week's General Reminder on ${ReminderManager.formatEnglishDate(new Date())}`;
@@ -352,12 +355,12 @@ class ReminderManager {
                         successOrFailure = "success";
                         this.sendEmail(generalReminderEmails,title,successOrFailure,displayDocUrl);
                         console.log(`Next week's general reminders were successfully shared by email.`);
-                        return;
+                        return true;
                       } else {
                         successOrFailure = "failure";
                         this.sendEmail(generalReminderEmails,title,successOrFailure);
                         console.log(`Next week's general reminders could not be shared since the Google Doc is not set, which was informed by email.`);
-                        return;
+                        return true;
                       }
                     }
                 } else {
@@ -366,7 +369,7 @@ class ReminderManager {
                     let subject = "Error on Sharing General Reminders (Today or Next Week)";
                     console.log(`Error on Sharing General Reminders (Today or Next Week).`);
                     GmailApp.sendEmail(email,subject,body);
-                    return;
+                    return true;
                 }
               }
 
@@ -389,12 +392,12 @@ class ReminderManager {
                         successOrFailure = "success";
                         this.sendEmail(email,title,successOrFailure,displayDocUrl);
                         console.log(`Today's reminders were successfully shared with ${staffName} by email.`);
-                        return;
+                        return true;
                       } else {
                         successOrFailure = "failure";
                         this.sendEmail(email,title,successOrFailure);
                         console.log(`Today's reminders could not be shared with ${staffName} since the Google Doc is not set, which was informed by email.`);
-                        return;
+                        return true;
                       }
                     } else if (this.period === 'week'){
                       title = `Next Week's Reminder for ${staffName} on ${ReminderManager.formatEnglishDate(new Date())}`;
@@ -411,7 +414,7 @@ class ReminderManager {
                         successOrFailure = "failure";
                         this.sendEmail(email,title,successOrFailure);
                         console.log(`Next week's reminders could not be shared with ${staffName} since the Google Doc is not set, which was informed by email.`);
-                        return;
+                        return true;
                       }
                     }
                   });
@@ -421,9 +424,10 @@ class ReminderManager {
                     let subject = "Error on Sharing General Reminders (Today or Next Week)";
                     console.log(`Error on Sharing General Reminders (Today or Next Week).`);
                     GmailApp.sendEmail(email,subject,body);
-                    return;
+                    return true;
                 }
               }
+            this.scriptProperties.deleteProperty(completionStatusKey);
           }
         } catch (e) {
             console.error(`Error in displayRemindersInDoc: ${e.toString()} at ${e.stack}`);
@@ -557,6 +561,65 @@ class ReminderManager {
       });
     }
 
+    /**
+     * Constructs the key used for storing the completion status of reminder data in script properties.
+     * 
+     * @returns {string} - The constructed completion status key.
+     */
+    getCompletionStatusKey() {
+        return `SCRIPT_PROPERTY_KEY_COMPLETION_STATUS_${this.target.toUpperCase()}_${this.period.toUpperCase()}`;
+    }
+
+    /**
+     * Creates a one-time trigger for a specific reminder function based on the target and period.
+     * The trigger is set to execute after a specified delay.
+     * A unique identifier for the trigger is stored in script properties along with target and period information.
+     */
+    createOneTimeTrigger() {
+        // Set a trigger for continuation
+        let triggerFunctionName = `run${this.target.charAt(0).toUpperCase() + this.target.slice(1)}Reminder${this.period.charAt(0).toUpperCase() + this.period.slice(1)}`;
+        let trigger = ScriptApp.newTrigger(triggerFunctionName)
+                              .timeBased()
+                              .after(10000) // For example, 10 seconds
+                              .create();
+
+        let triggerInfo = {
+            id: trigger.getUniqueId(),
+            target: this.target, // e.g., 'general'
+            period: this.period  // e.g., 'today'
+        };
+
+        let scriptProperties = PropertiesService.getScriptProperties();
+        scriptProperties.setProperty(trigger.getUniqueId(), JSON.stringify(triggerInfo));
+        console.log(`Trigger for the function, ${triggerFunctionName} is set. triggerInfo is ${JSON.stringify(triggerInfo)}`);
+    }
+
+    /**
+     * Deletes one-time triggers that match the specific target and period of the ReminderManager instance.
+     * It retrieves each trigger's information from script properties and checks if it matches
+     * the target and period before deletion.
+     */
+    deleteOneTimeTriggers() {
+          let allTriggers = ScriptApp.getProjectTriggers();
+          let scriptProperties = PropertiesService.getScriptProperties();
+
+          for (let i = 0; i < allTriggers.length; i++) {
+              let triggerId = allTriggers[i].getUniqueId();
+              let triggerInfoStr = scriptProperties.getProperty(triggerId);
+
+              if (triggerInfoStr) {
+                  let triggerInfo = JSON.parse(triggerInfoStr);
+
+                  // Check if the trigger is a one-time trigger for the specific target and period
+                  if (triggerInfo.target === this.target && triggerInfo.period === this.period) {
+                      ScriptApp.deleteTrigger(allTriggers[i]);
+                      scriptProperties.deleteProperty(triggerId); // Clean up the property
+                      console.log(`Following trigger and script properties for that trigger were deleted: trigger_${triggerId}/ script properties_${triggerInfoStr}`);
+                  }
+              }
+          }
+    }
+
 }
 
 /**
@@ -564,33 +627,44 @@ class ReminderManager {
  * It collects data for today's tasks and updates the Google Doc with reminder information.
  */
 function runGeneralReminderToday() {
-  let generalReminderToday = new ReminderManager('general', 'today');
-  generalReminderToday.shareRemindersByDoc();
+    let generalReminderToday = new ReminderManager('general', 'today');
+    generalReminderToday.shareRemindersByDoc();
 }
 
 /**
  * Triggers the function to display next week's general reminder.
  * It collects data for next week's tasks and updates the Google Doc with reminder information.
  */
-function runGeneralReminderNextWeek() {
-  let generalReminderNextWeek = new ReminderManager('general', 'week');
-  generalReminderNextWeek.shareRemindersByDoc();
+function runGeneralReminderWeek() {
+    let generalReminderWeek = new ReminderManager('general', 'week');
+    generalReminderWeek.shareRemindersByDoc();
 }
 
 /**
  * Triggers the function to display today's reminder for each of designated staff.
  * It collects data for today's tasks and updates the Google Doc with reminder information.
  */
-function runStaffReminderToday() {
-    let staffReminderToday = new ReminderManager('staffBased', 'today');
-    staffReminderToday.shareRemindersByDoc();
+function runStaffBasedReminderToday() {
+    let staffBasedReminderToday = new ReminderManager('staffBased', 'today');
+    staffBasedReminderToday.shareRemindersByDoc();
 }
 
 /**
  * Triggers the function to display next week's reminder for each of designated staff.
  * It collects data for next week's tasks and updates the Google Doc with reminder information.
  */
-function runStaffReminderNextWeek() {
-    let staffReminderWeek = new ReminderManager('staffBased', 'week');
-    staffReminderWeek.shareRemindersByDoc();
+function runStaffBasedReminderNextWeek() {
+    let staffBasedReminderWeek = new ReminderManager('staffBased', 'week');
+    staffBasedReminderWeek.shareRemindersByDoc();
 }
+
+// function deleteAllTriggers() {
+//     let allTriggers = ScriptApp.getProjectTriggers();
+
+//     for (let i = 0; i < allTriggers.length; i++) {
+//         ScriptApp.deleteTrigger(allTriggers[i]);
+//     }
+// }
+
+
+

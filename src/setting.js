@@ -13,7 +13,7 @@ function onOpen() {
       .addSeparator()
       .addItem('Modify Editors of the Current Sheet', 'modifyEditorsModal');
 
-    let subMenu_3 = ui.createMenu('REMINDER')
+    let subMenu_3 = ui.createMenu('TEST')
       .addItem(`Send General Today's Reminder`,'runGeneralReminderToday')
       .addSeparator()
       .addItem(`Send General Next Week's Reminder`, 'runGeneralReminderNextWeek')
@@ -21,6 +21,8 @@ function onOpen() {
       .addItem(`Send Staff-Based Today's Reminder`,'runStaffReminderToday')
       .addSeparator()
       .addItem(`Send Staff-Based Next Week's Reminder`,'runStaffReminderNextWeek')
+      .addSeparator()
+      .addItem(`Update Completion Status`,'updateCompletionStatusToSheet')
 
     let subMenu_4 = ui.createMenu('BEFORE FIRST USE')
       .addItem(`Conduct Authorization`,'showAuthorization')
