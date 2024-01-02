@@ -16,11 +16,11 @@ function onOpen() {
     let subMenu_3 = ui.createMenu('TEST')
       .addItem(`Send General Today's Reminder`,'runGeneralReminderToday')
       .addSeparator()
-      .addItem(`Send General Next Week's Reminder`, 'runGeneralReminderNextWeek')
+      .addItem(`Send General Next Week's Reminder`, 'runGeneralReminderWeek')
       .addSeparator()
-      .addItem(`Send Staff-Based Today's Reminder`,'runStaffReminderToday')
+      .addItem(`Send Staff-Based Today's Reminder`,'runStaffBasedReminderToday')
       .addSeparator()
-      .addItem(`Send Staff-Based Next Week's Reminder`,'runStaffReminderNextWeek')
+      .addItem(`Send Staff-Based Next Week's Reminder`,'runStaffBasedReminderWeek')
       .addSeparator()
       .addItem(`Update Completion Status`,'updateCompletionStatusToSheet')
 
@@ -104,9 +104,9 @@ function showSettingListsModal() {
     
     // Check the status of each trigger
     htmlTemplate.isGeneralReminderTodaySet = isTriggerAlreadySet_('runGeneralReminderToday');
-    htmlTemplate.isGeneralReminderNextWeekSet = isTriggerAlreadySet_('runGeneralReminderNextWeek');
-    htmlTemplate.isStaffReminderTodaySet = isTriggerAlreadySet_('runStaffReminderToday');
-    htmlTemplate.isStaffReminderNextWeekSet = isTriggerAlreadySet_('runStaffReminderNextWeek');
+    htmlTemplate.isGeneralReminderWeekSet = isTriggerAlreadySet_('runGeneralReminderWeek');
+    htmlTemplate.isStaffReminderTodaySet = isTriggerAlreadySet_('runStaffBasedReminderToday');
+    htmlTemplate.isStaffReminderWeekSet = isTriggerAlreadySet_('runStaffBasedReminderWeek');
     htmlTemplate.isUpdateCompletionStatusToSheet = isTriggerAlreadySet_('updateCompletionStatusToSheet');
     
     let html = htmlTemplate
@@ -543,11 +543,11 @@ function setReminderTrigger(functionName) {
 
   if (functionName === 'runGeneralReminderToday') {
     triggerTime = { hour: 8, everyDays: 1 }; // 8 AM daily
-  } else if (functionName === 'runGeneralReminderNextWeek') {
+  } else if (functionName === 'runGeneralReminderWeek') {
     triggerTime = { weekDay: ScriptApp.WeekDay.FRIDAY, hour: 16 }; // Every Friday at 4 PM
-  } else if (functionName === 'runStaffReminderToday') {
+  } else if (functionName === 'runStaffBasedReminderToday') {
     triggerTime = { hour: 8, everyDays: 1 }; // 8 AM daily
-  } else if (functionName === 'runStaffReminderNextWeek') {
+  } else if (functionName === 'runStaffBasedReminderWeek') {
     triggerTime = { weekDay: ScriptApp.WeekDay.FRIDAY, hour: 16 }; // Every Friday at 4 PM
   } else if (functionName === 'updateCompletionStatusToSheet'){
     triggerTime = { hour: 17, everyDays: 1 }; // 5 PM daily

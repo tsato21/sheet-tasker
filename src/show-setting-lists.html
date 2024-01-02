@@ -143,10 +143,10 @@
             <td class="type-cell">Trigger for Next Week's General Reminder</td>
             <td class="description-cell">Sets a trigger to send reminder through Gmail/Google Doc showing all incomplete tasks whose dates are in 5 days excluding Saturday and Sunday or before.<br>【Trigger Details】Time-drive/ Week timer/ Every Friday/ 4pm</td>
             <td class="button-cell">
-                <? if (isGeneralReminderNextWeekSet) { ?>
-                    <button class="delete-button" onclick="proceedSetting('deleteGeneralReminderNextWeekTrigger')">Delete</button>
+                <? if (isGeneralReminderWeekSet) { ?>
+                    <button class="delete-button" onclick="proceedSetting('deleteGeneralReminderWeekTrigger')">Delete</button>
                 <? } else { ?>
-                    <button class="set-button" onclick="proceedSetting('setGeneralReminderNextWeekTrigger')">Set</button>
+                    <button class="set-button" onclick="proceedSetting('setGeneralReminderWeekTrigger')">Set</button>
                 <? } ?>
             </td>
         </tr>
@@ -189,19 +189,19 @@
             <td class="description-cell">Sets a trigger for reminder of a specific staff through Gmail/Google Doc showing all incomplete tasks whose dates are today or before.<br>【Trigger Details】Time-drive/ Daily timer/ 8am</td>
             <td class="button-cell">
                 <? if (isStaffReminderTodaySet) { ?>
-                    <button class="delete-button" onclick="proceedSetting('deleteStaffReminderTodayTrigger')">Delete</button>
+                    <button class="delete-button" onclick="proceedSetting('deleteStaffBasedReminderTodayTrigger')">Delete</button>
                 <? } else { ?>
-                    <button class="set-button" onclick="proceedSetting('setStaffReminderTodayTrigger')">Set</button>
+                    <button class="set-button" onclick="proceedSetting('setStaffBasedReminderTodayTrigger')">Set</button>
                 <? } ?>
             </td>
         </tr>
             <td class="type-cell">Trigger for Next Week's Staff-Based Reminder</td>
             <td class="description-cell">Sets a trigger to send reminder of a specific staff through Gmail/Google Doc showing all incomplete tasks whose dates are in 5 days excluding Saturday and Sunday or before.<br>【Trigger Details】Time-drive/ Week timer/ Every Friday/ 4pm</td>
             <td class="button-cell">
-                <? if (isStaffReminderNextWeekSet) { ?>
-                    <button class="delete-button" onclick="proceedSetting('deleteStaffReminderNextWeekTrigger')">Delete</button>
+                <? if (isStaffReminderWeekSet) { ?>
+                    <button class="delete-button" onclick="proceedSetting('deleteStaffBasedReminderWeekTrigger')">Delete</button>
                 <? } else { ?>
-                    <button class="set-button" onclick="proceedSetting('setStaffReminderNextWeekTrigger')">Set</button>
+                    <button class="set-button" onclick="proceedSetting('setStaffBasedReminderWeekTrigger')">Set</button>
                 <? } ?>
             </td>
         <tr>
@@ -281,11 +281,11 @@
               return;
           }
           //Trigger to send the next week's reminder
-          if (settingType === 'setGeneralReminderNextWeekTrigger') {
-              google.script.run.withSuccessHandler(closeDialog).withFailureHandler(handleFailure).setReminderTrigger('runGeneralReminderNextWeek');
+          if (settingType === 'setGeneralReminderWeekTrigger') {
+              google.script.run.withSuccessHandler(closeDialog).withFailureHandler(handleFailure).setReminderTrigger('runGeneralReminderWeek');
               return;
-          } else if (settingType === 'deleteGeneralReminderNextWeekTrigger') {
-              google.script.run.withSuccessHandler(closeDialog).withFailureHandler(handleFailure).deleteReminderTrigger('runGeneralReminderNextWeek');
+          } else if (settingType === 'deleteGeneralReminderWeekTrigger') {
+              google.script.run.withSuccessHandler(closeDialog).withFailureHandler(handleFailure).deleteReminderTrigger('runGeneralReminderWeek');
               return;
           }
 
@@ -310,16 +310,16 @@
               return;
           }
           //Trigger to send the today's reminder
-          if (settingType === 'setStaffReminderTodayTrigger') {
-              google.script.run.withSuccessHandler(closeDialog).withFailureHandler(handleFailure).setReminderTrigger('runStaffReminderToday');
-          } else if (settingType === 'deleteStaffReminderTodayTrigger') {
-              google.script.run.withSuccessHandler(closeDialog).withFailureHandler(handleFailure).deleteReminderTrigger('runStaffReminderToday');
+          if (settingType === 'setStaffBasedReminderTodayTrigger') {
+              google.script.run.withSuccessHandler(closeDialog).withFailureHandler(handleFailure).setReminderTrigger('runStaffBasedReminderToday');
+          } else if (settingType === 'deleteStaffBasedReminderTodayTrigger') {
+              google.script.run.withSuccessHandler(closeDialog).withFailureHandler(handleFailure).deleteReminderTrigger('runStaffBasedReminderToday');
           }
           //Trigger to send the next week's reminder
-          if (settingType === 'setStaffReminderNextWeekTrigger') {
-              google.script.run.withSuccessHandler(closeDialog).withFailureHandler(handleFailure).setReminderTrigger('runStaffReminderNextWeek');
-          } else if (settingType === 'deleteStaffReminderNextWeekTrigger') {
-              google.script.run.withSuccessHandler(closeDialog).withFailureHandler(handleFailure).deleteReminderTrigger('runStaffReminderNextWeek');
+          if (settingType === 'setStaffBasedReminderWeekTrigger') {
+              google.script.run.withSuccessHandler(closeDialog).withFailureHandler(handleFailure).setReminderTrigger('runStaffBasedReminderWeek');
+          } else if (settingType === 'deleteStaffBasedReminderWeekTrigger') {
+              google.script.run.withSuccessHandler(closeDialog).withFailureHandler(handleFailure).deleteReminderTrigger('runStaffBasedReminderWeek');
           }
 
           /*

@@ -37,10 +37,10 @@ function updateAllTaskIndexSheets() {
     });
 
     // Update the ongoing task index sheet
-    updateSheetWithTaskData(ongoingTaskIndexSh, ongoingTasks, "#FF8C00");
+    updateSheetWithTaskData_(ongoingTaskIndexSh, ongoingTasks, "#FF8C00");
 
     // Update the completed task index sheet
-    updateSheetWithTaskData(completedTaskIndexSh, completedTasks, "#696969");
+    updateSheetWithTaskData_(completedTaskIndexSh, completedTasks, "#696969");
 
   } catch (error) {
     Logger.log("Error updating task index sheets: " + error.message);
@@ -57,7 +57,7 @@ function updateAllTaskIndexSheets() {
  * @param {Object} categoryData - An object containing task data categorized.
  * @param {string} tabColor - The color code for the sheet's tab.
  */
-function updateSheetWithTaskData(sheetToUpdate, categoryData, tabColor) {
+function updateSheetWithTaskData_(sheetToUpdate, categoryData, tabColor) {
   sheetToUpdate.clear();
   let lastColNum = sheetToUpdate.getMaxColumns();
   let needColNum = Object.keys(categoryData).length;

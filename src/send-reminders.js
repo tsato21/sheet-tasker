@@ -652,7 +652,7 @@ function runStaffBasedReminderToday() {
  * Triggers the function to display next week's reminder for each of designated staff.
  * It collects data for next week's tasks and updates the Google Doc with reminder information.
  */
-function runStaffBasedReminderNextWeek() {
+function runStaffBasedReminderWeek() {
     let staffBasedReminderWeek = new ReminderManager('staffBased', 'week');
     staffBasedReminderWeek.shareRemindersByDoc();
 }
