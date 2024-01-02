@@ -184,8 +184,7 @@ class ReminderManager {
 
           // Check elapsed time, if more than 5 minutes (3000 seconds for a buffer), save progress and exit
           // On timeout, trigger sendGeneralReminder
-          // if ((new Date().getTime() - startTime) > 300000) {
-          if ((new Date().getTime() - startTime) > 700) {
+          if ((new Date().getTime() - startTime) > 300000) {
            // Save progress with the unique key
             this.scriptProperties.setProperty(storedDataKey, JSON.stringify(this.reminderData));
             this.scriptProperties.setProperty(currentSheetIndexKey, i.toString());
