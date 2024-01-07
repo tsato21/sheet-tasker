@@ -177,7 +177,7 @@ class ReminderManager {
         for (let i = currentSheetIndex; i < sheets.length; i++) {
           let sheet = sheets[i];
           let sheetName = sheet.getName();
-          console.log(`Start reading ${sheetName}`);
+          // console.log(`Start reading ${sheetName}`);
 
           // Simulate a long-running process for testing purposes by sleeping for 10 seconds
           // Utilities.sleep(10000);
@@ -195,7 +195,7 @@ class ReminderManager {
             return;
             
           } else {
-            console.log(`Execusion continues when reading the data in ${sheetName}`);
+            // console.log(`Execusion continues when reading the data in ${sheetName}`);
           }
 
           if (sheetName !== ONGOING_TASKS_INDEX_SHEET_NAME && sheetName !== COMPLETED_TASKS_INDEX_SHEET_NAME) {
@@ -329,6 +329,11 @@ class ReminderManager {
 
                     if(this.period === 'today'){
                       title = `Today's General Reminder on ${ReminderManager.formatEnglishDate(new Date())}`;
+                      // Check if the title includes "Saturday" or "Sunday"
+                      if (title.includes("Saturday") || title.includes("Sunday")) {
+                          console.log("Since today is either Saturday or Sunday, the reminder email is not sent.");
+                          return; // Exit the function if it's Saturday or Sunday
+                      }
                       if(generalTodayReminderDocUrl !== null){
                         docId = ReminderManager.extractDocIdFromUrl(generalTodayReminderDocUrl);
                         body = this.presetInDoc(docId, title);
@@ -344,6 +349,7 @@ class ReminderManager {
                         console.log(`Today's general reminders could not be shared since the Google Doc is not set, which was informed by email.`);
                         return true;
                       }
+
                     } else if(this.period === 'week') {
                       title = `Next Week's General Reminder on ${ReminderManager.formatEnglishDate(new Date())}`;
                       if(generalWeekReminderDocUrl !== null){
@@ -382,6 +388,11 @@ class ReminderManager {
 
                     if(this.period === 'today'){
                       title = `Today's Reminder for ${staffName} on ${ReminderManager.formatEnglishDate(new Date())}`;
+                      // Check if the title includes "Saturday" or "Sunday"
+                      if (title.includes("Saturday") || title.includes("Sunday")) {
+                          console.log("Since today is either Saturday or Sunday, the reminder email is not sent.");
+                          return; // Exit the function if it's Saturday or Sunday
+                      }
                       if(staffInfo.todayReminderUrl){
                         docId = ReminderManager.extractDocIdFromUrl(staffInfo.todayReminderUrl);
                         body = this.presetInDoc(docId, title);
@@ -657,13 +668,12 @@ function runStaffBasedReminderWeek() {
     staffBasedReminderWeek.shareRemindersByDoc();
 }
 
-// function deleteAllTriggers() {
-//     let allTriggers = ScriptApp.getProjectTriggers();
+/*
+function deleteAllTriggers() {
+    let allTriggers = ScriptApp.getProjectTriggers();
 
-//     for (let i = 0; i < allTriggers.length; i++) {
-//         ScriptApp.deleteTrigger(allTriggers[i]);
-//     }
-// }
-
-
-
+    for (let i = 0; i < allTriggers.length; i++) {
+        ScriptApp.deleteTrigger(allTriggers[i]);
+    }
+}
+*/
