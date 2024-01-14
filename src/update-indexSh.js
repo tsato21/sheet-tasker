@@ -24,7 +24,7 @@ function updateAllTaskIndexSheets() {
         let taskInfo = { url: sheetURL };
 
         if (sheetName.includes(completionFlag)) {
-          [category, task] = sheetName.replace(`${completionFlag}`).split(":").map(part => part.trim());
+          [category, task] = sheetName.replace(completionFlag,"").split(":").map(part => part.trim());
           completedTasks[category] = completedTasks[category] || [];
           taskInfo.task = task;
           completedTasks[category].push(taskInfo);
