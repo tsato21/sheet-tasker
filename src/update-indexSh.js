@@ -3,10 +3,11 @@
  * This function organizes tasks into categories and updates the corresponding index sheets.
  */
 function updateAllTaskIndexSheets() {
-  // Global letiables
   let ss = SpreadsheetApp.getActiveSpreadsheet();
-  let ongoingTaskIndexSh = ss.getSheetByName(ONGOING_TASKS_INDEX_SHEET_NAME);
-  let completedTaskIndexSh = ss.getSheetByName(COMPLETED_TASKS_INDEX_SHEET_NAME);
+  let indexSheetInfo = JSON.parse(PropertiesService.getScriptProperties().getProperty(SCRIPT_PROPERTY_INDEX_SHEET));
+  let ongoingTaskIndexSh = ss.getSheetByName(indexSheetInfo.ongoingTaskSheetName);
+  let completedTaskIndexSh = ss.getSheetByName(indexSheetInfo.completedTaskSheetName);
+  let completionFlag = indexSheetInfo.completionFlag;
   try {
     let allSheets = ss.getSheets();
     let ongoingTasks = {};
@@ -22,8 +23,8 @@ function updateAllTaskIndexSheets() {
         let sheetURL = `${ss.getUrl()}#gid=${sheetGID}`;
         let taskInfo = { url: sheetURL };
 
-        if (sheetName.includes("Fin")) {
-          [category, task] = sheetName.replace("Fin)", "").split(":").map(part => part.trim());
+        if (sheetName.includes(completionFlag)) {
+          [category, task] = sheetName.replace(`${completionFlag}`).split(":").map(part => part.trim());
           completedTasks[category] = completedTasks[category] || [];
           taskInfo.task = task;
           completedTasks[category].push(taskInfo);
@@ -120,8 +121,9 @@ function updateSheetWithTaskData_(sheetToUpdate, categoryData, tabColor) {
 function sortTaskSheetByDate(sheet, sheetName) {
   let lastRow = sheet.getLastRow();
   let lastCol = sheet.getLastColumn();
+  let indexSheetInfo = JSON.parse(PropertiesService.getScriptProperties().getProperty(SCRIPT_PROPERTY_INDEX_SHEET));
 
-  if (sheetName !== ONGOING_TASKS_INDEX_SHEET_NAME && sheetName !== COMPLETED_TASKS_INDEX_SHEET_NAME && lastRow > 1) {
+  if (sheetName !== indexSheetInfo.ongoingTaskSheetName && sheetName !== indexSheetInfo.completedTaskSheetName && lastRow > 1) {
     // console.log(`sheetName is ${sheetName}`);
     let range = sheet.getRange(2, 1, lastRow - 1, lastCol);
     range.sort({ column: 4, ascending: true });

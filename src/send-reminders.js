@@ -38,6 +38,9 @@ class ReminderManager {
         this.reminderData = [];
         this.ss = SpreadsheetApp.getActiveSpreadsheet();
         this.scriptProperties = PropertiesService.getScriptProperties();
+        let indexSheetInfo = JSON.parse(this.scriptProperties.getProperty(SCRIPT_PROPERTY_INDEX_SHEET));
+        this.ongoingTaskSheetName = indexSheetInfo.ongoingTaskSheetName;
+        this.completedTaskSheetName = indexSheetInfo.completedTaskSheetName;
     }
 
     /*
@@ -198,7 +201,7 @@ class ReminderManager {
             // console.log(`Execusion continues when reading the data in ${sheetName}`);
           }
 
-          if (sheetName !== ONGOING_TASKS_INDEX_SHEET_NAME && sheetName !== COMPLETED_TASKS_INDEX_SHEET_NAME) {
+          if (sheetName !== this.ongoingTaskSheetName && sheetName !== this.completedTaskSheetName) {
 
             let lastRow = sheet.getRange("B" + sheet.getMaxRows()).getNextDataCell(SpreadsheetApp.Direction.UP).getRow();
             let lastCol = sheet.getLastColumn();

@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 10px;
+      background-color: #f4f4f4;
+    }
+    h2 {
+      color: #333;
+    }
+    select, input[type="text"] {
+      width: 80%;
+      padding: 10px;
+      margin: 10px 0;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+    button {
+      background-color: #4CAF50;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    button:hover {
+      opacity: 0.9;
+    }
+    label {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <h2>Index Sheet Settings</h2>
+
+  <!-- Description for Ongoing & Completed Task Index Sheet -->
+  <h4>
+    <p>Please select the sheet name that will be used as the index for ongoing tasks and completed tasks. This sheet will accumulate and display information of all tasks by category (category name, task sheet name, and the task sheet URL).</p>
+  </h4>
+  <label for="ongoing-task-index-sheet">Ongoing Task Index Sheet Name</label>
+  <select id="ongoing-task-index-sheet" required>
+    <option value="" <?= !ongoingTaskSheetName ? 'selected' : '' ?>>Select sheet name</option>
+    <? for (let i = 0; i < sheetNames.length; i++) { ?>
+      <option value="<?= sheetNames[i] ?>" <?= sheetNames[i] === ongoingTaskSheetName ? 'selected' : '' ?>><?= sheetNames[i] ?></option>
+    <? } ?>
+  </select>
+
+  
+  <label for="completed-task-index-sheet">Completed Task Index Sheet Name</label>
+  <select id="completed-task-index-sheet" required>
+    <option value="" <?= !completedTaskSheetName ? 'selected' : '' ?>>Select sheet name</option>
+    <? for (let i = 0; i < sheetNames.length; i++) { ?>
+      <option value="<?= sheetNames[i] ?>" <?= sheetNames[i] === completedTaskSheetName ? 'selected' : '' ?>><?= sheetNames[i] ?></option>
+    <? } ?>
+  </select>
+
+  <label for="back-to-index-phrase">Phrase to Go Back to Index Sheet</label>
+  <input type="text" id="back-to-index-phrase" value="<?= backToIndexPhrase ?>" required>
+
+  <label for="sheet-completion-flag">Flag for Sheet Completion</label>
+  <input type="text" id="sheet-completion-flag" value="<?= completionFlag ?>" required>
+
+  <button onclick="passIndexSheetInfo()">Save Settings</button>
+
+  <script>
+    function passIndexSheetInfo() {
+      let ongoingTaskSheetName = document.getElementById('ongoing-task-index-sheet').value;
+      let completedTaskSheetName = document.getElementById('completed-task-index-sheet').value;
+      let backToIndexPhrase = document.getElementById('back-to-index-phrase').value;
+      let completionFlag = document.getElementById('sheet-completion-flag').value;
+
+      // Validate inputs
+      if (!ongoingTaskSheetName || !completedTaskSheetName || !backToIndexPhrase || !completionFlag) {
+        alert('Please fill in all fields.');
+        return;
+      }
+
+      // Prepare data to be saved
+      let indexSheetInfo = {
+        ongoingTaskSheetName: ongoingTaskSheetName,
+        completedTaskSheetName: completedTaskSheetName,
+        backToIndexPhrase: backToIndexPhrase,
+        completionFlag: completionFlag
+      };
+
+      google.script.run
+            .withSuccessHandler(closeDialog)
+            .withFailureHandler(handleFailure)
+            .setIndexSheetInfo(indexSheetInfo);
+        
+    }
+
+    /**
+     * Handles failures in server-side script execution.
+     * Displays an error message to the user.
+     *
+     * @param {Object} error - The error object returned from the server-side script.
+     */
+    function handleFailure(error) {
+      console.error("An error occurred: " + error);
+      alert("An error occurred: " + error);
+    }
+
+    /**
+     * Closes the dialog or web app.
+     * This function is used as a success handler in server-side function calls.
+     */
+    function closeDialog() {
+      google.script.host.close();
+    }
+  </script>
+</body>
+</html>

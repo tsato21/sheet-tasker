@@ -9,11 +9,13 @@ class TaskSheetManager {
      */
     constructor() {
         this.spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
-        let indexSheet = this.spreadsheet.getSheetByName(ONGOING_TASKS_INDEX_SHEET_NAME);
-        this.indexSheetURL = indexSheet ? this.spreadsheet.getUrl() + "#gid=" + indexSheet.getSheetId() : "";
-        let existingStaffDataString = PropertiesService.getScriptProperties().getProperty(SCRIPT_PROPERTY_KEY_STAFF);
-        this.existingStaffData = JSON.parse(existingStaffDataString || '[]');
         this.scriptProperties = PropertiesService.getScriptProperties();
+        let indexSheetInfo = JSON.parse(this.scriptProperties.getProperty(SCRIPT_PROPERTY_INDEX_SHEET));
+        let indexSheet = this.spreadsheet.getSheetByName(indexSheetInfo.ongoingTaskSheetName);
+        this.indexSheetURL = indexSheet ? this.spreadsheet.getUrl() + "#gid=" + indexSheet.getSheetId() : "";
+        this.backToIndexPhrase = indexSheetInfo.backToIndexPhrase;
+        let existingStaffDataString = this.scriptProperties.getProperty(SCRIPT_PROPERTY_KEY_STAFF);
+        this.existingStaffData = JSON.parse(existingStaffDataString || '[]');
     }
 
     /**
@@ -175,7 +177,7 @@ class TaskSheetManager {
                       .setHorizontalAlignment("center")
 
           // Set hyperlink, background, fontWeight, and horizontalAlignment for "Back to Index" in A1
-          newSheet.getRange("A1").setFormula(`=HYPERLINK("${this.indexSheetURL}", "${BUTTON_TO_INDEX_SHEET}")`)
+          newSheet.getRange("A1").setFormula(`=HYPERLINK("${this.indexSheetURL}", "${this.backToIndexPhrase}")`)
                                 .setBackground("#FFCCCC")
                                 .setFontWeight("bold")
                                 .setHorizontalAlignment("center")

@@ -81,6 +81,18 @@
             <th>Action</th>
         </tr>
         <tr>
+            <td class="type-cell">Index Sheet Information</td>
+            <td class="description-cell">Configure information for index sheets (for ongoing and completed tasks) such as setting sheet name.</td>
+            <td class="button-cell">
+                <? if (isIndexSheetPropertyKey) { ?>
+                    <button class="update-button" onclick="proceedSetting('setIndexSheet')">Update</button>
+                    <button class="delete-button" onclick="proceedSetting('resetIndexSheet',<?= isIndexSheetPropertyKey ?>)">Reset</button>
+                <? } else { ?>
+                    <button class="set-button" onclick="proceedSetting('setIndexSheet')">Set</button>
+                <? } ?>
+            </td>
+        </tr>
+        <tr>
             <td class="type-cell">Staff of this Spreadsheet</td>
             <td class="description-cell">Configure staff information for this Google Sheet (names and email addresses).</td>
             <td class="button-cell">
@@ -238,6 +250,17 @@
        */
       function proceedSetting(settingType,scriptyPropertyKey) {
           // Call your server-side function based on the value here
+
+          /*
+          For Index Sheet Information
+          */
+          if (settingType === 'setIndexSheet') {
+              google.script.run.withSuccessHandler(closeDialog).withFailureHandler(handleFailure).showIndexSheetInfoModal();
+              return;
+          } else if (settingType === 'resetIndexSheet') {
+              google.script.run.withSuccessHandler(closeDialog).withFailureHandler(handleFailure).deleteDesignatedScriptProperty(settingType,scriptyPropertyKey);
+              return;
+          }
 
           /*
           For Staff of this Spreadsheet

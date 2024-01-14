@@ -54,33 +54,37 @@ function showAuthorization(){
 
 /**
  * Resets the Google Spreadsheet to its original format.
- * This function clears the content of Ongoing and Completed Tasks Index Sheets,
- * deletes all other sheets, and resets the script properties and triggers.
- * 
- * It iterates through all sheets in the active spreadsheet. If a sheet matches
- * the predefined Ongoing or Completed Tasks Index Sheet names, it clears the content
- * of that sheet. Otherwise, it deletes the sheet. After processing all sheets,
- * it resets the script properties and triggers.
+ * This function first creates a new sheet and sets it as the first sheet in the spreadsheet.
+ * Then, it iterates through all existing sheets and deletes them, except for the newly created sheet.
+ * Finally, it resets script properties and triggers related to the spreadsheet.
+ * A message box is displayed upon completion to confirm the actions taken.
  *
- * A message box is displayed upon completion of the process.
+ * @example
+ * // To use this function, simply call it without any parameters.
+ * returnToOriginalFormat();
  */
 function returnToOriginalFormat() {
   let spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+
+  // Create a new sheet first
+  let newSheet = spreadsheet.insertSheet("New Sheet"); // Replace "New Sheet" with your desired sheet name
+  
+  // Move the new sheet to the first position
+  newSheet.activate();
+  spreadsheet.moveActiveSheet(1);
+
+  // Get all sheets including the new sheet
   let allSheets = spreadsheet.getSheets();
   
-  for (let sheet of allSheets) {
-    let sheetName = sheet.getName();
-    if (sheetName === ONGOING_TASKS_INDEX_SHEET_NAME || sheetName === COMPLETED_TASKS_INDEX_SHEET_NAME) {
-      sheet.clear();
-      continue; // Skip the current iteration and continue with the next sheet
-    }
-    spreadsheet.deleteSheet(sheet); // Correct method to delete the sheet
+  // Delete all sheets except the new sheet
+  for (let i = 1; i < allSheets.length; i++) { // Start from the second sheet
+    spreadsheet.deleteSheet(allSheets[i]);
   }
 
   resetScriptPropertiesAndTriggers();
 
   // Display a message box after completion
-  Browser.msgBox("Return to the original format (All sheets except Index Sheets deleted/Contents in index sheets cleared/ Pre-defined information reset/ Pre-set triggers deleted).");
+  Browser.msgBox("Return to the original format (All sheets except 'New Sheet' deleted/ Pre-defined information reset/ Pre-set triggers deleted).");
 }
 
 /**
@@ -90,6 +94,9 @@ function showSettingListsModal() {
     // Create a template from the HTML file
     let htmlTemplate = HtmlService.createTemplateFromFile('show-setting-lists');
     let scriptProperties = PropertiesService.getScriptProperties();
+
+    //Index Sheet
+    htmlTemplate.isIndexSheetPropertyKey = scriptProperties.getProperty(SCRIPT_PROPERTY_INDEX_SHEET) !== null ? "SCRIPT_PROPERTY_INDEX_SHEET" : null;
 
     //Staff of this Spreadsheet
     htmlTemplate.isStaffPropertyKey = scriptProperties.getProperty(SCRIPT_PROPERTY_KEY_STAFF) !== null ? "SCRIPT_PROPERTY_KEY_STAFF" : null;
@@ -134,6 +141,56 @@ function selectNextAction(description,type){
     }
   }
 
+}
+
+/**
+ * Displays a modal for setting index sheet information.
+ */
+function showIndexSheetInfoModal() {
+  let indexSheetInfoString = PropertiesService.getScriptProperties().getProperty(SCRIPT_PROPERTY_INDEX_SHEET);
+  let indexSheetInfo = JSON.parse(indexSheetInfoString || '{}');
+
+  // Retrieve all sheet names from the spreadsheet
+  let sheetNames = SpreadsheetApp.getActiveSpreadsheet().getSheets().map(sheet => sheet.getName());
+
+  // Create a template from the HTML file
+  let htmlTemplate = HtmlService.createTemplateFromFile('show-index-sheet-info');
+  htmlTemplate.ongoingTaskSheetName = indexSheetInfo.ongoingTaskSheetName || "";
+  htmlTemplate.completedTaskSheetName = indexSheetInfo.completedTaskSheetName || "";
+  htmlTemplate.backToIndexPhrase = indexSheetInfo.backToIndexPhrase || "";
+  htmlTemplate.completionFlag = indexSheetInfo.completionFlag || "";
+  htmlTemplate.sheetNames = sheetNames;  // Pass the sheet names to the template
+
+  let html = htmlTemplate
+      .evaluate()
+      .setWidth(600)  // Adjusted width
+      .setHeight(600); // Adjusted height
+  SpreadsheetApp.getUi().showModalDialog(html, 'Index Sheet Information');
+}
+
+/**
+ * Sets up index sheet information in the script's properties.
+ */
+function setIndexSheetInfo(indexSheetInfo) {
+  try{
+    let updatedIndexSheetInfo = {
+      'ongoingTaskSheetName': indexSheetInfo.ongoingTaskSheetName,
+      'completedTaskSheetName':indexSheetInfo.completedTaskSheetName,
+      'backToIndexPhrase':indexSheetInfo.backToIndexPhrase,
+      'completionFlag':indexSheetInfo.completionFlag
+    };
+
+    // Store general reminder emails in ScriptProperties
+    PropertiesService.getScriptProperties().setProperty(SCRIPT_PROPERTY_INDEX_SHEET, JSON.stringify(updatedIndexSheetInfo));
+    let successDescription = "Index sheet information were successfully set.";
+    selectNextAction(successDescription,"success");
+
+  }  catch (error) {
+    Logger.log("Error setting index sheet information: " + error.message);
+    Logger.log("Stack Trace: " + error.stack);
+    let failureDescription = `Failed to set index sheet information.`;
+    selectNextAction(failureDescription,"failure");
+  }
 }
 
 /**
