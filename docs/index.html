@@ -54,12 +54,12 @@ layout: default
           <h2>Project Usage</h2>
           <ol class="list-group list-group-numbered">
             <li class="list-group-item">
-              <strong>Initial Configuration</strong>: Initiate your project setup by navigating to <strong>`Custom Menu` > `SETTINGS` > `Set Pre-Defined Info`</strong> to tailor the system to your operational needs.
+              <strong>Initial Configuration</strong>(Mandatory): Initiate your project setup by navigating to <strong>`Custom Menu` > `SETTINGS` > `Set Pre-Defined Info`</strong> to tailor the system to your operational needs.
               <ul>
-                <li><em>General Settings</em>: Compulsory for configuration on information for index sheets and editor of this spreadsheet.</li>
+                <li><em>General Settings</em>(Mandatory): Configuration on information for index sheets and editor of this spreadsheet.</li>
                 <li><em>General Reminder Settings</em>: Fundamental for establishing email reminders and configuring URLs of reminders to display target reminders.</li>
-                <li><em>Staff-Specific Reminder Settings</em>: Optional, dedicated to individual staff reminders.</li>
-                <li><em>Miscellaneous Settings</em>: Assign a trigger for monitoring task completion statuses in Google Doc and updating completion filed in Google Sheet.</li>
+                <li><em>Staff-Specific Reminder Settings</em>(Optional): Optionally, you can make settings for reminders of individual staff reminders.</li>
+                <li><em>Google Sheet and Doc Integration</em>(Mandatory): Assign a trigger for monitoring task completion statuses in Google Doc and updating completion filed in Google Sheet.</li>
               </ul>
               <div class="row">
                 <div class="col-md-3">
@@ -81,8 +81,8 @@ layout: default
               <strong>Task Sheet Generation</strong>: Effortlessly create task sheets by selecting <strong>`Custom Menu` > `TASK SHEETS` > `Create a New Task Sheet`</strong>, designed to support a structured format for task assignment.
               <ul>
                 <li>Delegate tasks seamlessly to team members using the in-built dropdown functionality within the task sheet.</li>
+                <li>To alter the task sheet's access permissions, proceed to `Custom Menu` > `TASK SHEETS` > `Modify Editors of the Current Sheet`.</li>
               </ul>
-              <p>To alter the task sheet's access permissions, proceed to `Custom Menu` > `TASK SHEETS` > `Modify Editors of the Current Sheet`.</p>
               <figure class="resize-image my-3">
                 <img src="assets/images/task-sheet-creation.png" alt="Task Sheet Interface" class="img-fluid image-caption" width="300" height="200">
                 <figcaption>Fig: Task Sheet Interface</figcaption>
@@ -127,7 +127,7 @@ layout: default
             <li class="list-group-item">
               <strong>Status Synchronization</strong>: Input "C" in "Complete" column for tasks in Google Docs, which is synchronized with your Google Sheets.
               <p>*You can test this synchronization by <strong>`Custom Menu` > `TEST` >`Update Completion Status`</strong>.</p>
-              <p>*Trigger setting is required in `SETTING`.</p>
+              <p>*Trigger setting in advance is required in `SETTING`.</p>
               <div class="row">
                 <div class="col-md-5">
                   <figure class="resize-image my-3">
@@ -145,8 +145,7 @@ layout: default
             </li>
         
             <li class="list-group-item">
-              <strong>Tools to Organize Sheet Info</strong>: Optimize your sheet organization by using <strong>`Custom Menu` > `Update Index Sheets and Sort Task Sheets`</strong>, which sorts task sheets by date and update index sheets.
-              <p>Label completed task sheets with the pre-set completion flag for automatic inclusion in the `completed-task-index`.(*Set the flag in "Setting" in advance.)</p>
+              <strong>Tools to Organize Sheet Info</strong>: Optimize your sheet organization by using <strong>`Custom Menu` > `Update Index Sheets and Sort Task Sheets`</strong>, which sorts task sheets by date and update index sheets. Label completed task sheets with the pre-set completion flag for automatic inclusion in the `completed-task-index`.(*Set the flag in "Setting" in advance.)
               <figure class="resize-image my-3">
                 <img src="assets/images/update-index-sort-taskSh.png" alt="Sheet Management Tools" class="img-fluid image-caption" width="300" height="200">
                 <figcaption>Fig: Tools to Organize Sheets</figcaption>
