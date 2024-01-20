@@ -13,7 +13,7 @@ layout: default_jpn
         <p>このプロジェクトは、Google Sheetsでのタスク管理を自動化するためのGoogle Apps Scriptです。これにより、個人の業務及びチーム内での業務を効率的に管理することが可能になります。</p>
         <ul>
             <li>自動リマインダーを使ってタスクを効率的に管理します。</li>
-            <li>Google Sheetsの機能とシームレスに統合します。</li>
+            <li>Google Sheetsの様々な機能(保護機能やチェックボックス)を使用し、効率的なタスク管理を実現します。</li>
             <li>様々な使用状況に合わせてカスタマイズ可能です。</li>
         </ul>
 
@@ -26,23 +26,23 @@ layout: default_jpn
         <h2 id="setup" class="mt-4">セットアップ</h2>
         <ol>
             <li>
-                <strong>Google Sheetにアクセス</strong>：まず、<a href="https://docs.google.com/spreadsheets/d/1POCm-y8m7gonF4plOzVxxAk_1y8vjSP1xLR-4-mcMTU/edit#gid=0" target="_blank" rel="noopener noreferrer">サンプルGoogle Sheet</a>を開きます。リマインダー用のサンプルGoogle Documentは<a href="https://drive.google.com/drive/folders/1lAcVzQ62BFrIlk0XRJJugsWFGrQZj_xb" target="_blank" rel="noopener noreferrer">こちら</a>から参照できます。(Google Docについては後のセクションに詳細を記載)
+                <strong>Google Sheetにアクセス</strong>：<a href="https://docs.google.com/spreadsheets/d/1POCm-y8m7gonF4plOzVxxAk_1y8vjSP1xLR-4-mcMTU/edit#gid=0" target="_blank" rel="noopener noreferrer">サンプルGoogle Sheet</a>を開きます。リマインダー用のサンプルGoogle Documentは<a href="https://drive.google.com/drive/folders/1lAcVzQ62BFrIlk0XRJJugsWFGrQZj_xb" target="_blank" rel="noopener noreferrer">こちら</a>から参照できます。(Google Docについては後のセクションにて詳細を記載)
             </li>
             <li>
                 <strong>シートをコピー</strong>：Google Sheetのコピーを作成し、個人用バージョンを作成します。
             </li>
             <li>
-                <strong>認証</strong>：「Custom Menu」に移動し、「Conduct Authorization」ボタンをクリックして、Google Apps Scriptの認証プロセスを開始します。
+                <strong>認証</strong>：「Custom Menu」>「Conduct Authorization」ボタンをクリックして、Google Apps Scriptの認証プロセスを開始します。
                 <div class="resize-image my-3 container-img">
                     <img src="assets/images/gas-authorization.png" alt="Google Apps Script 認証" width="300" height="200">
                     <div class="image-caption">図: GAS認証</div>
                 </div>
             </li>
             <li>
-                <strong>元のフォーマットに戻す</strong>：「Custom Menu」に移動し、「Return to Original Format」ボタンをクリックして、Google Sheetを元のフォーマットに戻します（サンプルタスクシートの削除／目次シートの内容のクリア／サンプル情報のリセット／サンプルトリガーの削除）。
+                <strong>元のフォーマットに戻す</strong>：「Custom Menu」>「Return to Original Format」ボタンをクリックして、Google Sheetを元のフォーマットに戻します（サンプルタスクシートの削除／目次シートの内容のクリア／サンプル情報のリセット／サンプルトリガーの削除）。
             </li>
             <li>
-                <strong>変数のカスタマイズ（任意）</strong>：Apps Scriptエディタを訪れて、`variables.gs`の定数をご自身の要件に合わせて変更します。(Google Apps Scriptでのカスタマイズを実施する場合のみ)
+                <strong>変数のカスタマイズ（任意）</strong>：Apps Scriptエディタにアクセスし、`variables.gs`の定数をご自身の要件に合わせて変更します。(Google Apps Scriptでのカスタマイズを実施する場合のみ)
                 <div class="resize-image my-3 container-img">
                     <img src="assets/images/customize-constants.png" alt="定数のカスタマイズ" width="300" height="200">
                     <div class="image-caption">図: 変数のカスタマイズ</div>
@@ -54,12 +54,12 @@ layout: default_jpn
           <h2>プロジェクトの使用詳細</h2>
           <ol class="list-group list-group-numbered">
             <li class="list-group-item">
-              <strong>初期設定</strong>：「Custom Menu」 > 「SETTINGS」 > 「Set Pre-Defined Info」に移動して、システムを運用ニーズに合わせてカスタマイズしてプロジェクト設定を開始します。
+              <strong>初期設定</strong>：「Custom Menu」 > 「SETTINGS」 > 「Set Pre-Defined Info」に移動して、運用ニーズに合わせてカスタマイズしてプロジェクト設定を開始します。
               <ul>
                 <li><em>General Settings</em>(必須)：目次シートと当該Google Sheetの編集者情報の設定。</li>
                 <li><em>General Reminder Settings</em>(必須)：対象期間のタスクを通知するリマインダーの設定とリマインドタスクを掲載するGoogle DocumentのURL設定。</li>
-                <li><em>スタッフベースのリマインダー設定</em>(任意)：特定のスタッフに割り当てられたリマインダーを通知するための設定。General Reminderに加えて、スタッフベースでのリマインダーを使用する場合には当該設定が必須。</li>
-                <li><em>その他の設定</em>：Google Doc内のタスク完了状況をトラッキングし、Google Sheetの完了状況を更新するための設定。(必須)</li>
+                <li><em>Staff-Based Reminder Settings</em>(任意)：特定のスタッフに割り当てられたリマインダーを通知するための設定。General Reminderに加えて、スタッフベースでのリマインダーを使用する場合には当該設定が必須。</li>
+                <li><em>Google Sheet and Doc Integration</em>(必須)：Google Doc内のタスク完了状況をトラッキングし、Google Sheetの完了状況を更新するための設定。</li>
               </ul>
               <div class="row">
                 <div class="col-md-3">
@@ -71,7 +71,7 @@ layout: default_jpn
                 <div class="col-md-9">
                   <figure>
                     <img src="assets/images/setup-image-2.png" alt="設定の機能" class="img-fluid image-caption" width="500" height="300">
-                    <figcaption>図: 設定の機能</figcaption>
+                    <figcaption>図: 設定画面</figcaption>
                   </figure>
                 </div>
               </div>
@@ -80,17 +80,17 @@ layout: default_jpn
             <li class="list-group-item">
               <strong>タスクシートの作成</strong>：「Custom Menu」 > 「TASK SHEETS」 > 「Create a New Task Sheet」を選択し、タスクシートを新規作成。(所定のフォーマットで自動作成される)
               <ul>
-                  <li>タスクシート内に記載する各タスクについて、「Staff」欄のプルダウンから特定のスタッフを割り当てることも可能。(スタッフベースのリマインダーを設定した場合、当該スタッフにリマインダー通知される。)</li>
+                  <li>タスクシート内に記載する各タスクについて、「Staff」欄のプルダウンから特定のスタッフを割り当てが可能。(スタッフベースのリマインダーを設定した場合、当該スタッフにリマインダー通知される。)</li>
+                  <li>タスクシートの編集権限はシート作成時に指定したスタッフのみに付与される。編集権限を変更するには、「Custom Menu」 > 「TASK SHEETS」 > 「Modify Editors of the Current Sheet」を実行。</li>
               </ul>
-              <p>タスクシートの編集権限はシート作成時に指定したスタッフのみに付与される。編集権限を変更するには、「Custom Menu」 > 「TASK SHEETS」 > 「Modify Editors of the Current Sheet」を実行。</p>
               <figure class="resize-image my-3">
                   <img src="assets/images/task-sheet-creation.png" alt="タスクシートインターフェース" class="img-fluid image-caption" width="300" height="200">
-                  <figcaption>図: タスクシートインターフェース</figcaption>
+                  <figcaption>図: タスクシート新規作成画面</figcaption>
               </figure>
           </li>
           
           <li class="list-group-item">
-              <strong>リマインダーのテスト</strong>：「Custom Menu」 > 「TEST」を通じて、リマインダーシステムをテストします。利用前に各リマインダーごとのGoogle Documentが作成され、URLが設定されていることを確認してください。システムが問題なく稼働した場合、リマインダータスクが記載されたGoogle Documentリンクを含んだメールが送信されます。
+              <strong>リマインダーのテスト</strong>：「Custom Menu」 > 「TEST」を通じて、リマインダーシステムをテストします。利用前に各リマインダーごとのGoogle Documentが作成され、「Settings」で各DocのURLが設定されていることを確認してください。システムが問題なく稼働した場合、リマインダーメール(リマインダータスクが記載されたDocのリンク付き)が送信されます。
               <!-- 最初の画像は自分の行に -->
               <div class="row">
                   <div class="col-12">
@@ -127,7 +127,7 @@ layout: default_jpn
           <li class="list-group-item">
               <strong>タスク完了状況の同期</strong>：Google Document内の「Complete」欄に「C」と入力すると、Google Sheetと同期し、Google SheetのCompleteが完了(チェック)に変わります。
               <p>*この同期をテストするには、「Custom Menu」 > 「TEST」 >「Update Completion Status」を実行してください。</p>
-              <p>*「SETTING」でトリガー設定が必要です。</p>
+              <p>*毎日指定の時間に同期を実行するためには「SETTING」でトリガー設定が必要です。</p>
               <div class="row">
                   <div class="col-md-5">
                       <figure class="resize-image my-3">
@@ -145,8 +145,7 @@ layout: default_jpn
           </li>
           
           <li class="list-group-item">
-              <strong>シート情報の整理ツール</strong>：「Custom Menu」 > 「Update Index Sheets and Sort Task Sheets」を使用して、各シートの整理をします。これにより、各タスクシートを日付順に並べ替え、目次シートを更新します。
-              <p>完了済みのタスクシートについては、シート名に完了フラグを付けると、「completed-task-index」に自動的に表示されます。(*完了フラグは「Setting」で事前設定する必要あり)</p>
+              <strong>シート情報の整理ツール</strong>：「Custom Menu」 > 「Update Index Sheets and Sort Task Sheets」を使用して、各シートの整理をします。これにより、各タスクシートを日付順に並べ替え、目次シートを更新します。完了済みのタスクシートについては、シート名に完了フラグを付けると、「completed-task-index」に自動的に表示されます。(*完了フラグは「Setting」で事前設定する必要あり)
               <figure class="resize-image my-3">
                   <img src="assets/images/update-index-sort-taskSh.png" alt="シート管理ツール" class="img-fluid image-caption" width="300" height="200">
                   <figcaption>図: シート整理ツール</figcaption>
@@ -155,11 +154,10 @@ layout: default_jpn
           </ol>
           </section>
           
-          <h2 id="others" class="mt-4">その他</h2>
-          <ul>
-              <li>コードを追加することで、レポート生成やデータ分析など、追加機能を探索することができます。</li>
-              <li>特定のワークフローや要件に合わせてスクリプトをカスタマイズすることも可能です。</li>
-          </ul>
+        <h2 id="others" class="mt-4">その他</h2>
+        <ul>
+            <li>コードを追加することで、レポート生成やデータ分析などの機能を追加したり、特定のワークフローや要件に合わせてスクリプトをカスタマイズすることも可能です。</li>
+        </ul>
     </div>
 </div>
           
