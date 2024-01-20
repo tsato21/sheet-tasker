@@ -3,8 +3,9 @@ layout: default
 ---
 <div class="content">
     <div class="container py-4">
+      <a href="index_jpn.html">Japanese Version</a>
         <h1 id="top" class="mb-4">About this Project</h1>
-        <p>This project introduces an advanced Google Apps Script to automate task management and tracking in Google Sheets, offering a seamless and customizable experience.</p>
+        <p>This project introduces an advanced Google Apps Script to automate task management in Google Sheets, offering a seamless and customizable experience.</p>
         <ul>
             <li>Efficiently manage tasks with automated reminders.</li>
             <li>Seamlessly integrate with Google Sheets functionalities.</li>
@@ -14,14 +15,13 @@ layout: default
         <h2 id="prerequisites" class="mt-4">Prerequisites</h2>
         <ul>
             <li>A Google account with access to Google Sheets.</li>
-            <li>A foundational understanding of Google Sheets and Google Apps Script.</li>
-            <li>The ability to execute step-by-step setup instructions.</li>
+            <li>A foundational understanding of Google Sheets.</li>
         </ul>
 
         <h2 id="setup" class="mt-4">Setup</h2>
         <ol>
             <li>
-                <strong>Access Your Google Sheet</strong>: Begin by opening the <a href="https://docs.google.com/spreadsheets/d/1POCm-y8m7gonF4plOzVxxAk_1y8vjSP1xLR-4-mcMTU/edit#gid=0" target="_blank" rel="noopener noreferrer">Sample Google Sheet</a>. For your reference, you can find sample Google Documents for reminders from <a href="https://drive.google.com/drive/folders/1lAcVzQ62BFrIlk0XRJJugsWFGrQZj_xb" target="_blank" rel="noopener noreferrer">HERE</a>.
+                <strong>Access Your Google Sheet</strong>: Begin by opening the <a href="https://docs.google.com/spreadsheets/d/1POCm-y8m7gonF4plOzVxxAk_1y8vjSP1xLR-4-mcMTU/edit#gid=0" target="_blank" rel="noopener noreferrer">Sample Google Sheet</a>. For your reference, you can find sample Google Documents for reminders from <a href="https://drive.google.com/drive/folders/1lAcVzQ62BFrIlk0XRJJugsWFGrQZj_xb" target="_blank" rel="noopener noreferrer">HERE</a>(This will be explained in the later section).
             </li>
             <li>
                 <strong>Copy the Sheet</strong>: Make a copy of the Google Sheet to create your personalized version.
@@ -52,10 +52,10 @@ layout: default
             <li class="list-group-item">
               <strong>Initial Configuration</strong>: Initiate your project setup by navigating to <strong>`Custom Menu` > `SETTINGS` > `Set Pre-Defined Info`</strong> to tailor the system to your operational needs.
               <ul>
-                <li><em>General Settings</em>: Compulsory for configuration on information for index sheets and staff of this spreadsheet.</li>
-                <li><em>General Reminder Settings</em>: Fundamental for establishing email reminders and configuring display URLs for reminders within Google Docs.</li>
+                <li><em>General Settings</em>: Compulsory for configuration on information for index sheets and editor of this spreadsheet.</li>
+                <li><em>General Reminder Settings</em>: Fundamental for establishing email reminders and configuring URLs of reminders to display target reminders.</li>
                 <li><em>Staff-Specific Reminder Settings</em>: Optional, dedicated to individual staff reminders.</li>
-                <li><em>Miscellaneous Settings</em>: Assign triggers for monitoring task completion statuses.</li>
+                <li><em>Miscellaneous Settings</em>: Assign a trigger for monitoring task completion statuses in Google Doc and updating completion filed in Google Sheet.</li>
               </ul>
               <div class="row">
                 <div class="col-md-3">
@@ -86,7 +86,7 @@ layout: default
             </li>
         
             <li class="list-group-item">
-              <strong>Reminders Evaluation</strong>: Evaluate the reminder system via <strong>`Custom Menu` > `TEST`</strong>. Ensure Google Docs are established for each reminder type prior to utilization. If the system works as expected, you will receive an email notification with the link to the Google Doc.
+              <strong>Reminders Testing</strong>: Test the reminder system via <strong>`Custom Menu` > `TEST`</strong>. Ensure Google Docs are established for each reminder type prior to utilization. If the system works as expected, you will receive an email notification with the link to the Google Doc.
               <!-- First image on its own line -->
               <div class="row">
                 <div class="col-12">
@@ -121,7 +121,7 @@ layout: default
             </li>
         
             <li class="list-group-item">
-              <strong>Status Synchronization</strong>: Input "C" for tasks in Google Docs, which is synchronized with your Google Sheets.
+              <strong>Status Synchronization</strong>: Input "C" in "Complete" column for tasks in Google Docs, which is synchronized with your Google Sheets.
               <p>*You can test this synchronization by <strong>`Custom Menu` > `TEST` >`Update Completion Status`</strong>.</p>
               <p>*Trigger setting is required in `SETTING`.</p>
               <div class="row">
@@ -141,11 +141,11 @@ layout: default
             </li>
         
             <li class="list-group-item">
-              <strong>Organizational Tools</strong>: Optimize your sheet organization by using <strong>`Custom Menu` > `Update Index Sheets and Sort Task Sheets`</strong>, which sorts task sheets by date and update index sheets.
-              <p>Label completed task sheets with the pre-set completion flag for automatic inclusion in the `completed-task-index`.</p>
+              <strong>Tools to Organize Sheet Info</strong>: Optimize your sheet organization by using <strong>`Custom Menu` > `Update Index Sheets and Sort Task Sheets`</strong>, which sorts task sheets by date and update index sheets.
+              <p>Label completed task sheets with the pre-set completion flag for automatic inclusion in the `completed-task-index`.(*Set the flag in "Setting" in advance.)</p>
               <figure class="resize-image my-3">
                 <img src="assets/images/update-index-sort-taskSh.png" alt="Sheet Management Tools" class="img-fluid image-caption" width="300" height="200">
-                <figcaption>Fig: Sheet Management Tools</figcaption>
+                <figcaption>Fig: Tools to Organize Sheets</figcaption>
               </figure>
             </li>
           </ol>
