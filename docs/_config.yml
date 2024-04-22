@@ -1,7 +1,0 @@
-# Site settings
-theme: jekyll-theme-primer
-title: 'Task & Reminder Management'
-description: 'This project involves a Google Apps Script designed to manage tasks in Google Sheet and use Doc for task reminders with automation and efficiency.'
-
-title_jpn: 'タスク&リマインダー管理'
-description_jpn: 'このプロジェクトは、Google Apps Scriptを使用し、Google Sheet上でのタスク管理、Google Docを使用したリマインダー通知を行、自動的・効率的にタスク管理することを可能にする。'
